@@ -8,9 +8,35 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout 
+        android:id="@+id/main_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        
+		<Button
+	        android:id="@+id/add_room"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:text="@string/add_room" />
+	
+	    <Button
+	        android:id="@+id/delete_room"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:text="@string/delete_room" />
+        
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listRooms1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/main_buttons"
+        android:layout_centerHorizontal="true" >
+
+    </ListView>
 
 </RelativeLayout>
