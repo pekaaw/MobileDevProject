@@ -1,12 +1,10 @@
 package hig.imt3672.mobiledevproject;
 
-import android.app.Dialog;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.View;
-import android.view.Window;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements AddRoomDialog.Communicator{
@@ -15,8 +13,7 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-			
+					
 		findViewById(R.id.add_room_btn)
 			.setOnClickListener( new View.OnClickListener() {
 				
