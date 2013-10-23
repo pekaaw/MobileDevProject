@@ -24,12 +24,7 @@
 	        style="?android:attr/buttonBarButtonStyle"
 	        />
 		
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dip"
-            android:background="?android:attr/dividerVertical" />
-		
-        <Button
+		<Button
 	        android:id="@+id/delete_room"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
