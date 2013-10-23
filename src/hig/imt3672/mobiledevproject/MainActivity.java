@@ -2,11 +2,13 @@ package hig.imt3672.mobiledevproject;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 public class MainActivity extends Activity {
 	
@@ -108,8 +110,17 @@ public class MainActivity extends Activity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
 			View view = inflater.inflate( R.layout.add_name_dialog, container, false );
-			View textView = findViewByID(R.id.add_room_instruction);
+			View textView = view.findViewById(R.id.add_room_instruction);
 			
+			Button button = (Button) view.findViewById(R.id.add_room_ok);
+			button.setOnClickListener( new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					((FragmentDialog) getActivity()).showDialog();
+					
+				}
+			});
 		}
 	}
 }
