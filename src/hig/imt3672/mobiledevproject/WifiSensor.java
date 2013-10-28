@@ -1,3 +1,19 @@
+/*CREDITS:
+ * The most basic implementation was aided along with the help of this:
+ * http://stackoverflow.com/questions/5452940/
+ * 
+ * Ordering the entries in the list was done with help from this:
+ * http://stackoverflow.com/questions/9109890/
+ * 
+ * Learning how to implement a service can be attributed to:
+ * http://developer.android.com/guide/components/services.html
+ * 
+ * Thanks, stackoverflow.com
+ * 
+ * HELP:
+ * If you are unfamiliar with what a ScanResult contains, this document is okay:
+ * http://developer.android.com/reference/android/net/wifi/ScanResult.html*/
+
 package hig.imt3672.mobiledevproject;
 
 import java.util.Collections;
