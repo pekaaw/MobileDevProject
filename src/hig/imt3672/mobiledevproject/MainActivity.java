@@ -1,11 +1,12 @@
 package hig.imt3672.mobiledevproject;
 
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
+import android.view.Window;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements AddRoomDialog.Communicator{
@@ -16,17 +17,29 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 		setContentView(R.layout.activity_main);
 		
 			
-		Button button = (Button) findViewById(R.id.add_room_btn);
-		button.setOnClickListener( new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
+		findViewById(R.id.add_room_btn)
+			.setOnClickListener( new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+						
+					// For adding a room, open dialog to supply name
+					addRoomNameDialog(v);
+				}
+				
+			});
+		
+		findViewById(R.id.delete_room_btn)
+			.setOnClickListener( new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
 					
-				// custom dialog
-				showDialog(v);
-			}
-			
-		});
+					// For deleting a room, open a dialog to confirm
+					deleteRoomDialog(v);
+				}
+			});
+		
 	}
 
 	@Override
@@ -36,18 +49,40 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 		return true;
 	}
 	
-	public void showDialog(View view) {
+	/**
+	 * addRoomNameDialog - Open a dialog to name a new Room
+	 * <p>
+	 * For adding a room, open dialog to supply name.<br>
+	 * Dialog will contain an EditText-field for the name and 
+	 * the buttons OK and CANCEL.
+	 * 
+	 * @param view The view that was clicked to prompt the dialog.
+	 */
+	public void addRoomNameDialog(View view) {
 		FragmentManager manager = getFragmentManager();
 		AddRoomDialog addRoomDialog = new AddRoomDialog();
 		addRoomDialog.show(manager, "Add a new room.");
 	}
 	
-//	@Override
-//	public void onDialogMessage(String message) {
-//		// TODO Auto-generated method stub
-//		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-//	}
+	public void deleteRoomDialog(View view) {
+		//FragmentManager manager = getFragmentManager();
+		
+//		final Dialog dialog = new Dialog(getApplicationContext());
+//		dialog.setContentView(R.layout.add_name_dialog);
+//		dialog.show();
+		
+	}
 	
+	/**
+	 * onAddRoomNameRecieved(String name)
+	 * <p>
+	 * The addRoomDialog has closed with a result.
+	 * <p>
+	 * Do an integrity check on the name that was supplied and <br>
+	 * create a new room. Get data from celltower and wifi networks.
+	 * 
+	 * @param name The name that was supplied from the dialog.
+	 */
 	@Override
 	public void onAddRoomNameRecieved(String name) {
 		// TODO: Integrity check on name
@@ -56,14 +91,6 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 		// Toast to debug purposes. To be deleted..
 		Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
 	}
-//	public void showDialog() {
-//		AlertDialog alertDialog = new AlertDialog.Builder(getBaseContext()).create();
-//		alertDialog.setTitle("Alert Dialog");
-//		alertDialog.setMessage("Welcome!");
-//		alertDialog.setIcon(R.drawable.ic_launcher);
-//
-//		alertDialog.show();
-//	}
 
 }
 
