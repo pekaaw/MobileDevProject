@@ -13,17 +13,20 @@ import android.os.IBinder;
 public class WifiSensor extends Service {
 	WifiManager wifi;
 	List<ScanResult> networks;
-    
+
+	public List<ScanResult> onStartCommand(int startId) {
+		networks = wifi.getScanResults();
+		Collections.sort(networks, new Comparator<ScanResult>() {
+			public int compare(ScanResult s1, ScanResult s2) {
+				return s1.BSSID.compareToIgnoreCase(s2.BSSID);
+			}
+		});
+		return networks;
+	}
+
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
-		networks = wifi.getScanResults();
-		Collections.sort(networks,new Comparator<ScanResult>() {
-			@Override
-	        public int compare(ScanResult s1, ScanResult s2) {
-	            return s1.BSSID.compareToIgnoreCase(s2.BSSID);
-	        }
-		});
 		return null;
 	}
 }
