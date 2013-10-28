@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.View;
-import android.view.Window;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements AddRoomDialog.Communicator{
@@ -65,10 +64,6 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 	
 	public void deleteRoomDialog(View view) {
 		//FragmentManager manager = getFragmentManager();
-		
-//		final Dialog dialog = new Dialog(getApplicationContext());
-//		dialog.setContentView(R.layout.add_name_dialog);
-//		dialog.show();
 		
 	}
 	
