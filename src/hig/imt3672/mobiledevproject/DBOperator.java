@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+
 //import org.w3c.dom.Comment;
 
 public class DBOperator {
@@ -32,7 +33,7 @@ public class DBOperator {
 
 	// /:::::::::::::::::::::::::::::LIST TYPE SPESIFIC
 	// BEGIN::::::::::::::::::::::
-	public DBRoomEntry createRoom(String comment) {
+	public DBRoomEntry createRoom(String room) {
 		ContentValues values = new ContentValues();
 		values.put(ExtendedSQLLiteHelper.ROOM_COLUMN_NAME, room);
 		long insertId = database.insert(ExtendedSQLLiteHelper.ROOM_TABLE, null,
