@@ -21,6 +21,14 @@ public class AddRoomDialog extends DialogFragment implements View.OnClickListene
 		
 		super.onAttach(activity);
 		communicator = (Communicator) activity;
+		//getDialog().getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.add_room);
+	}
+	
+	@Override
+	public void onStart() {
+		// TODO Auto-generated method stub
+		getDialog().getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.add_room);
+		super.onStart();
 	}
 	
 //	@Override
@@ -47,7 +55,7 @@ public class AddRoomDialog extends DialogFragment implements View.OnClickListene
 	
 		getDialog().setTitle(R.string.add_room);
 		
-		getDialog().getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.add_room);
+//		getDialog().getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.add_room);
 		
 		m_view = inflater.inflate(R.layout.add_name_dialog, null);
 		
@@ -57,12 +65,14 @@ public class AddRoomDialog extends DialogFragment implements View.OnClickListene
 		m_view.findViewById(R.id.add_room_cancel).setOnClickListener(this);
 		
 		setCancelable(false);
+		
 		return m_view;
 
 	}
 	
 	@Override
 	public void onClick(View v) {
+		getDialog().getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.add_room);
 		Log.d("onClick Event", "A button was pressed.");
 		switch(v.getId()) {
 			case R.id.add_room_cancel :

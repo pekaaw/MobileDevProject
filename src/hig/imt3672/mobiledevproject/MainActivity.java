@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.View;
+import android.view.Window;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements AddRoomDialog.Communicator{
@@ -58,7 +59,8 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 	public void addRoomNameDialog(View view) {
 		FragmentManager manager = getFragmentManager();
 		AddRoomDialog addRoomDialog = new AddRoomDialog();
-		addRoomDialog.show(manager, "Add a new room.");
+		addRoomDialog.show(manager, "add_room_dialog_id");
+		//addRoomDialog.getDialog().getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.add_room);
 	}
 	
 	public void deleteRoomDialog(View view) {
