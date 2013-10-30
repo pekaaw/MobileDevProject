@@ -16,7 +16,7 @@
         android:layout_height="wrap_content">
         
 		<Button
-	        android:id="@+id/add_room"
+	        android:id="@+id/add_room_btn"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_weight="1"
@@ -24,7 +24,7 @@
 	        android:text="@string/add_room" />
 	
 		<Button
-	        android:id="@+id/delete_room"
+	        android:id="@+id/delete_room_btn"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_weight="1"
