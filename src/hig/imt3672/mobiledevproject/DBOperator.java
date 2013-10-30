@@ -31,13 +31,48 @@ public class DBOperator { // Handles normal usage of the database
 
 	// :::::::::::::LIST TYPE SPESIFIC BEGIN::::::::::::::::::::::
 	public DBRoomEntry createRoom(String room) {
-		ContentValues values = new ContentValues();
-		values.put(ExtendedSQLLiteHelper.ROOM_COLUMN_NAME, room);
+		ContentValues roomValues = new ContentValues();
+		roomValues.put(ExtendedSQLLiteHelper.ROOM_COLUMN_NAME, room);
 		long insertId = database.insert(ExtendedSQLLiteHelper.ROOM_TABLE, null,
-				values);
+				roomValues);
 		Cursor cursor = database.query(ExtendedSQLLiteHelper.ROOM_TABLE,
 				allRooms, ExtendedSQLLiteHelper.ROOM_COLUMN_ID + " = "
 						+ insertId, null, null, null, null);
+
+		ContentValues wifiValues = new ContentValues();
+		wifiValues
+				.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID, insertId);
+		// <-is as it should be
+
+		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_WIFI_ID, room);
+		// <-NEEDS ID FROM ACTUAL WIFI (BSID)
+
+		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MAX, room);
+		// <-set a default value?
+
+		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN, room);
+		// <-set a default value?
+
+		/* long wifiInsertId = */
+		database.insert(ExtendedSQLLiteHelper.WIFI_ROOM_TABLE, null, wifiValues);
+
+		ContentValues cellValues = new ContentValues();
+		cellValues
+				.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID, insertId);
+		// <-is as it should be
+
+		cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_TOWER_ID, room);
+		// <-NEEDS ID FROM ACTUAL TOWER
+
+		cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MAX, room);
+		// <-set a default value?
+
+		cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MIN, room);
+		// <-set a default value?
+
+		/* long cellInsertId = */
+		database.insert(ExtendedSQLLiteHelper.CELLTOWER_TABLE, null, cellValues);
+
 		cursor.moveToFirst();
 		DBRoomEntry newRoom = cursorToDBRoomEntry(cursor);
 		cursor.close();
@@ -49,6 +84,14 @@ public class DBOperator { // Handles normal usage of the database
 		System.out.println("Room deleted with id: " + id);
 		database.delete(ExtendedSQLLiteHelper.ROOM_TABLE,
 				ExtendedSQLLiteHelper.ROOM_COLUMN_ID + " = " + id, null);
+
+		database.delete(ExtendedSQLLiteHelper.CELLTOWER_TABLE,
+				ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID + " = " + id,
+				null);
+
+		database.delete(ExtendedSQLLiteHelper.WIFI_ROOM_TABLE,
+				ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID + " = " + id,
+				null);
 	}
 
 	public List<DBRoomEntry> getAllDBRoomEntries() {
