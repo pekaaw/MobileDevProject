@@ -94,6 +94,102 @@ public class DBOperator { // Handles normal usage of the database
 				null);
 	}
 
+	public void updateRoom(DBRoomEntry room) {
+		// TO DO ::: OR NOT TO DO
+
+	}
+
+	public boolean updateWifi(DBRoomEntry room, String BSID, long signalStrenght) {
+		ContentValues cellValues = new ContentValues();
+		long roomId = room.getId();
+		// Database sql get-statements
+		String WIFI_GET_MAX = ("SELECT "
+				+ ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MAX + " FROM "
+				+ ExtendedSQLLiteHelper.WIFI_ROOM_TABLE + " WHERE "
+				+ ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_WIFI_ID + " = "
+				+ " ? AND " + ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID + " = ?");
+
+		String WIFI_GET_MIN = "SELECT "
+				+ ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN + " FROM "
+				+ ExtendedSQLLiteHelper.WIFI_ROOM_TABLE + " WHERE "
+				+ ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_WIFI_ID + " = ?"
+				+ " AND " + ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID
+				+ " = ?";
+
+		String GET_CELLTOWER = ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_WIFI_ID
+				+ " = ? AND " + ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID
+				+ " = ?";
+
+		Cursor cursor = database.rawQuery(WIFI_GET_MAX, new String[] { BSID,
+				String(roomId) });
+		long DBmax = cursorToNumber(cursor);
+		cursor = database.rawQuery(WIFI_GET_MIN, new String[] { BSID,
+				String(roomId) });
+		long DBmin = cursorToNumber(cursor);
+
+		if (signalStrenght > DBmax) {
+			cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MAX,
+					signalStrenght);
+		} else if (signalStrenght < DBmin) {
+
+			cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MIN,
+					signalStrenght);
+		} else {
+			return false;
+		}
+		database.update(ExtendedSQLLiteHelper.CELLTOWER_TABLE, cellValues,
+				GET_CELLTOWER, new String[] { BSID, String(roomId) });
+		return true;
+	}
+
+	public boolean updateCell(DBRoomEntry room, long cellId, long signalStrenght) {
+		ContentValues cellValues = new ContentValues();
+		long roomId = room.getId();
+		// Database sql get-statements
+		String CELLTOWER_GET_MAX = ("SELECT "
+				+ ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MAX + " FROM "
+				+ ExtendedSQLLiteHelper.CELLTOWER_TABLE + " WHERE "
+				+ ExtendedSQLLiteHelper.CELLTOWER_COLUMN_TOWER_ID + " = "
+				+ " ? AND " + ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID + " = ?");
+
+		String CELLTOWER_GET_MIN = "SELECT "
+				+ ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MIN + " FROM "
+				+ ExtendedSQLLiteHelper.CELLTOWER_TABLE + " WHERE "
+				+ ExtendedSQLLiteHelper.CELLTOWER_COLUMN_TOWER_ID + " = ?"
+				+ " AND " + ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
+				+ " = ?";
+
+		String GET_CELLTOWER = ExtendedSQLLiteHelper.CELLTOWER_COLUMN_TOWER_ID
+				+ " = ? AND " + ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
+				+ " = ?";
+
+		Cursor cursor = database.rawQuery(CELLTOWER_GET_MAX, new String[] {
+				String(cellId), String(roomId) });
+		long DBmax = cursorToNumber(cursor);
+		cursor = database.rawQuery(CELLTOWER_GET_MIN, new String[] {
+				String(cellId), String(roomId) });
+		long DBmin = cursorToNumber(cursor);
+
+		if (signalStrenght > DBmax) {
+			cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MAX,
+					signalStrenght);
+		} else if (signalStrenght < DBmin) {
+
+			cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MIN,
+					signalStrenght);
+		} else {
+			return false;
+		}
+		database.update(ExtendedSQLLiteHelper.CELLTOWER_TABLE, cellValues,
+				GET_CELLTOWER, new String[] { String(cellId), String(roomId) });
+		return true;
+	}
+
+	private String String(long roomId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public List<DBRoomEntry> getAllDBRoomEntries() {
 		List<DBRoomEntry> rooms = new ArrayList<DBRoomEntry>();
 
@@ -116,6 +212,10 @@ public class DBOperator { // Handles normal usage of the database
 		room.setId(cursor.getLong(0));
 		room.setName(cursor.getString(1));
 		return room;
+	}
+
+	private long cursorToNumber(Cursor cursor) {
+		return cursor.getLong(0);
 	}
 	// :::::::::::LIST TYPE SPESIFIC END:::::::::::::::
 }
