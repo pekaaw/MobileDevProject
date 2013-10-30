@@ -9,9 +9,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-//import org.w3c.dom.Comment;
-
-public class DBOperator {
+public class DBOperator { // Handles normal usage of the database
 
 	// Database fields
 	private SQLiteDatabase database;
@@ -31,8 +29,7 @@ public class DBOperator {
 		dbHelper.close();
 	}
 
-	// /:::::::::::::::::::::::::::::LIST TYPE SPESIFIC
-	// BEGIN::::::::::::::::::::::
+	// :::::::::::::LIST TYPE SPESIFIC BEGIN::::::::::::::::::::::
 	public DBRoomEntry createRoom(String room) {
 		ContentValues values = new ContentValues();
 		values.put(ExtendedSQLLiteHelper.ROOM_COLUMN_NAME, room);
@@ -77,6 +74,5 @@ public class DBOperator {
 		room.setName(cursor.getString(1));
 		return room;
 	}
-	// /:::::::::::::::::::::::::::::LIST TYPE SPESIFIC
-	// END::::::::::::::::::::::
+	// :::::::::::LIST TYPE SPESIFIC END:::::::::::::::
 }
