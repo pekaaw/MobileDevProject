@@ -1,20 +1,42 @@
 package hig.imt3672.mobiledevproject;
 
+import java.util.List;
+
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends FragmentActivity implements AddRoomDialog.Communicator, DeleteRoomDialog.Communicator{
+public class MainActivity extends FragmentActivity implements AddRoomDialog.Communicator, DeleteRoomDialog.Communicator {
+	
+	List<DBRoomEntry> list_of_rooms;
+	ArrayAdapter<DBRoomEntry> adapter_room_list;
+	DBOperator database;
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-					
+		
+		// get a handle to a database and open it.
+		database = new DBOperator(this);
+		database.open();
+		
+		// Set a listadapter to the listview (room-list)
+		list_of_rooms = database.getAllDBRoomEntries();
+		adapter_room_list = new ArrayAdapter<DBRoomEntry>(this,
+				android.R.layout.simple_list_item_1, list_of_rooms);
+		
+		ListView listView = (ListView) findViewById(R.id.listRooms);
+		listView.setAdapter(adapter_room_list);
+
+		// "Add room"-button: Assign onClick-event
 		findViewById(R.id.add_room_btn)
 			.setOnClickListener( new View.OnClickListener() {
 				
@@ -27,6 +49,7 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 				
 			});
 		
+		// "Delete room"-button: Assign onClick-event
 		findViewById(R.id.delete_room_btn)
 			.setOnClickListener( new View.OnClickListener() {
 				
@@ -37,7 +60,12 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 					deleteRoomDialog(v);
 				}
 			});
-		
+	}
+	
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
 	}
 
 	@Override
@@ -93,7 +121,12 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 	 */
 	@Override
 	public void onAddRoomNameRecieved(String name) {
-		// TODO: Integrity check on name
+		// integrity check - name must not be zero or >128 long
+		if( name.length() < 0 || name.length() > 128 ) {
+			return;
+		}
+		
+		
 		// TODO: Add name to new instance, then add celltower and wifi networks.
 		
 		// Toast to debug purposes. To be deleted..
@@ -115,7 +148,13 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 //			delete();	// To delete room. Remember: the identity of the room must be found somewhere...
 		}
 	}
-
+	
+	@Override
+	protected void onDestroy() {
+		database.close();
+		super.onDestroy();
+	}
+	
 }
 
 
