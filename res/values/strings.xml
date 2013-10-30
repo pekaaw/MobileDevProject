@@ -6,6 +6,7 @@
     <string name="add_room">Add room</string>
     <string name="delete_room">Delete room</string>
     <string name="add_room_instruction">Room name:</string>
+    <string name="delete_room_headline">Really delete room?</string>
     
 
 </resources>

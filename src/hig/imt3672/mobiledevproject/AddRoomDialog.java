@@ -49,8 +49,6 @@ public class AddRoomDialog extends DialogFragment implements View.OnClickListene
 	
 	@Override
 	public void onClick(View v) {
-		getDialog().getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.add_room);
-		Log.d("onClick Event", "A button was pressed.");
 		switch(v.getId()) {
 			case R.id.add_room_cancel :
 				dismiss();
