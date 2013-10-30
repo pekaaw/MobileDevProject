@@ -41,17 +41,18 @@ public class ExtendedSQLLiteHelper extends SQLiteOpenHelper { // Handles
 			+ " integer not null, " + CELLTOWER_COLUMN_ROOM_ID
 			+ " integer not null, " + CELLTOWER_COLUMN_MAX
 			+ " integer not null, " + CELLTOWER_COLUMN_MIN
-			+ " integer not null, " + ");";
+			+ " integer not null)";
 	private static final String ROOM_DATABASE_CREATE = "create table "
-			+ WIFI_ROOM_COLUMN_WIFI_ID + "(" + ROOM_COLUMN_ID
-			+ " autoincrement, " + ROOM_COLUMN_NAME + " text not null);";
+			+ ROOM_TABLE + " ( " + ROOM_COLUMN_ID
+			+ " integer PRIMARY KEY AUTOINCREMENT, " + ROOM_COLUMN_NAME 
+			+ " text not null)";
 
 	private static final String WIFI_ROOM_DATABASE_CREATE = "create table "
 			+ WIFI_ROOM_TABLE + "(" + WIFI_ROOM_COLUMN_WIFI_ID
 			+ " text not null, " + WIFI_ROOM_COLUMN_ROOM_ID
 			+ " integer not null, " + WIFI_ROOM_COLUMN_MAX
 			+ " integer not null, " + WIFI_ROOM_COLUMN_MIN
-			+ " integer not null, " + " text not null);";
+			+ " integer not null)";
 
 	public ExtendedSQLLiteHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
