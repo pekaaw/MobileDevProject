@@ -30,6 +30,46 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	// :::::::::::::LIST TYPE SPESIFIC BEGIN::::::::::::::::::::::
+	private boolean insertWifi(String wifiBSID, long roomId, long strength) {
+		ContentValues wifiValues = new ContentValues();
+		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID, roomId);
+		// <-is as it should be
+
+		wifiValues
+				.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_WIFI_ID, wifiBSID);
+		// <-NEEDS ID FROM ACTUAL WIFI (BSID)
+
+		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MAX, strength);
+		// <-set a default value?
+
+		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN, strength);
+		// <-set a default value?
+
+		/* long wifiInsertId = */
+		database.insert(ExtendedSQLLiteHelper.WIFI_ROOM_TABLE, null, wifiValues);
+		return true;
+	}
+
+	private boolean insertCell(long towerId, long roomId, long strength) {
+		ContentValues cellValues = new ContentValues();
+		cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID, roomId);
+		// <-is as it should be
+
+		cellValues
+				.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_TOWER_ID, towerId);
+		// <-NEEDS ID FROM ACTUAL TOWER
+
+		cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MAX, strength);
+		// <-set a default value?
+
+		cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MIN, strength);
+		// <-set a default value?
+
+		/* long cellInsertId = */
+		database.insert(ExtendedSQLLiteHelper.CELLTOWER_TABLE, null, cellValues);
+		return true;
+	}
+
 	public DBRoomEntry createRoom(String room) {
 		ContentValues roomValues = new ContentValues();
 		roomValues.put(ExtendedSQLLiteHelper.ROOM_COLUMN_NAME, room);
@@ -39,39 +79,17 @@ public class DBOperator { // Handles normal usage of the database
 				allRooms, ExtendedSQLLiteHelper.ROOM_COLUMN_ID + " = "
 						+ insertId, null, null, null, null);
 
-		ContentValues wifiValues = new ContentValues();
-		wifiValues
-				.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID, insertId);
-		// <-is as it should be
+		// for each wifi {
+		String wifiBSID = "42";
+		long wifiStrength = 42;
+		insertWifi(wifiBSID, insertId, wifiStrength);
+		// }
 
-		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_WIFI_ID, room);
-		// <-NEEDS ID FROM ACTUAL WIFI (BSID)
-
-		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MAX, room);
-		// <-set a default value?
-
-		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN, room);
-		// <-set a default value?
-
-		/* long wifiInsertId = */
-		database.insert(ExtendedSQLLiteHelper.WIFI_ROOM_TABLE, null, wifiValues);
-
-		ContentValues cellValues = new ContentValues();
-		cellValues
-				.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID, insertId);
-		// <-is as it should be
-
-		cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_TOWER_ID, room);
-		// <-NEEDS ID FROM ACTUAL TOWER
-
-		cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MAX, room);
-		// <-set a default value?
-
-		cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MIN, room);
-		// <-set a default value?
-
-		/* long cellInsertId = */
-		database.insert(ExtendedSQLLiteHelper.CELLTOWER_TABLE, null, cellValues);
+		// for each celltower {
+		long cellTowerId = 42;
+		long towerStrength = 42;
+		insertCell(cellTowerId, insertId, towerStrength);
+		// }
 
 		cursor.moveToFirst();
 		DBRoomEntry newRoom = cursorToDBRoomEntry(cursor);
@@ -100,6 +118,9 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	public boolean updateWifi(DBRoomEntry room, String BSID, long signalStrenght) {
+
+		// CHECK IF THE WIFI EXISTS BEFORE YOU RUN THIS FUNCTION
+
 		ContentValues cellValues = new ContentValues();
 		long roomId = room.getId();
 		// Database sql get-statements
@@ -143,6 +164,9 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	public boolean updateCell(DBRoomEntry room, long cellId, long signalStrenght) {
+
+		// CHECK IF THE CELLTOWER EXISTS BEFORE YOU RUN THIS FUNCTION
+
 		ContentValues cellValues = new ContentValues();
 		long roomId = room.getId();
 		// Database sql get-statements
