@@ -11,7 +11,7 @@
  * Thanks, stackoverflow.com
  */
 
-package hig.imt3672.mobiledevproject;
+package hig.imt3672.knowthisroom;
 
 import java.util.Collections;
 import java.util.Comparator;

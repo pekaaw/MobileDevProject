@@ -20,9 +20,9 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
-        <service android:name=".WifiSensor" />
+        <service android:name="hig.imt3672.knowthisroom.WifiSensor" />
         <activity
-            android:name="hig.imt3672.mobiledevproject.MainActivity"
+            android:name="hig.imt3672.knowthisroom.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
