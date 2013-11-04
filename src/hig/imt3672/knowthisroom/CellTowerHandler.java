@@ -2,6 +2,7 @@ package hig.imt3672.knowthisroom;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
@@ -22,24 +23,22 @@ public class CellTowerHandler extends Service {
 	SignalStrength mSignalStrength;
 	ServiceState mServiceState;
 	
-	int cellID;
-	int cellStrength;
-	int cellNoise;
-
+	Intent mIntent;
+	
 	// singleton
 	final TelephonyListener mTelListener = new TelephonyListener();
 	
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		setup();
+		setup(intent);
 // TODO remove the logging outputs for production
 Log.d("########", "CellTowerHandler Service Started");
 		return Service.START_STICKY;
 	}
 
 	
-	private void setup() {
+	private void setup(Intent intent) {
 		final TelephonyManager manager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
 		manager.listen(mTelListener, 
 				PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
@@ -48,6 +47,8 @@ Log.d("########", "CellTowerHandler Service Started");
 		
 				// This one is from API level 17, we do not use it then
 				// PhoneStateListener.LISTEN_CELL_INFO );
+		
+		mIntent = intent;
 	}
 	
 
@@ -58,10 +59,14 @@ Log.d("########", "CellTowerHandler Service Started");
 		return null;
 	}
 
-	public int[] getTowerInfo() {
+	public Bundle getTowerInfo() {
+		Bundle towerInfo = new Bundle();
 
-		final int[] towerInformation = { cellID, cellStrength, cellNoise };
-		return towerInformation;
+		towerInfo.putString("CellID", mCellLocation.toString());
+		towerInfo.putInt("Strength", mSignalStrength.getGsmSignalStrength());
+		towerInfo.putInt("cellNoise", mSignalStrength.getGsmBitErrorRate());
+		
+		return towerInfo;
 	}
 	
 	
@@ -77,6 +82,9 @@ Log.d("########", "CellTowerHandler Service Started");
 // TODO debugging
 Log.d("########", "Signal strength " + mSignalStrength.getGsmSignalStrength());
 			super.onSignalStrengthsChanged(strength);
+			
+			mIntent.replaceExtras(getTowerInfo());
+			sendBroadcast(mIntent);
 		}
 		
 		@Override
