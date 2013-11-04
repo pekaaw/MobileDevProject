@@ -1,4 +1,4 @@
-package hig.imt3672.mobiledevproject;
+package hig.imt3672.knowthisroom;
 
 import android.app.Activity;
 import android.app.DialogFragment;

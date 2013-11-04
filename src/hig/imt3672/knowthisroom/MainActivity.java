@@ -1,8 +1,9 @@
-package hig.imt3672.mobiledevproject;
+package hig.imt3672.knowthisroom;
 
 import java.util.List;
 
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
@@ -35,6 +36,9 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 		
 		ListView listView = (ListView) findViewById(R.id.listRooms);
 		listView.setAdapter(adapter_room_list);
+
+		// Let us start the CellTowerHandler service
+		startService(new Intent(this, CellTowerHandler.class));
 
 		// "Add room"-button: Assign onClick-event
 		findViewById(R.id.add_room_btn)

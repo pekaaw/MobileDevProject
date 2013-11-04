@@ -1,4 +1,4 @@
-package hig.imt3672.mobiledevproject;
+package hig.imt3672.knowthisroom;
 
 import java.util.ArrayList;
 import java.util.List;
