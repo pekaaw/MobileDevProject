@@ -17,33 +17,22 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import android.app.IntentService;
-import android.content.Context;
-import android.content.Intent;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-public class WifiSensor extends IntentService {
+public class WifiSensor {
 	
 	WifiManager wifi;
 	List<ScanResult> networks;
 	
-	public WifiSensor() {
-		super("WifiSensorService");
-		// TODO Auto-generated constructor stub
-	}
-
 	/*TIP:
 	 * For info on ScanResult:
 	 * http://developer.android.com/reference/android/net/wifi/ScanResult.html
 	 */
 	
-	@Override
-	public void onHandleIntent(Intent intent) {
-		Log.d ("WifiSensor","Starting service.");
-		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		
+	public List<ScanResult> GetNetworks() {
+
 		Log.d ("WifiSensor","Filling list.");
 		networks = wifi.getScanResults();
 
@@ -55,7 +44,8 @@ public class WifiSensor extends IntentService {
 				return s1.BSSID.compareToIgnoreCase(s2.BSSID);
 			}
 		});
-		
-		
+
+		Log.i ("WifiSensor","Sorted " + Integer.toString(networks.size()) + " networks.");
+		return networks;
 	}
 }
