@@ -125,7 +125,7 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 	@Override
 	public void onAddRoomNameRecieved(String name) {
 		// integrity check - name must not be zero or >128 long
-		if( name.length() < 0 || name.length() > 128 ) {
+		if( name.length() < 1 || name.length() > 128 ) {
 			return;
 		}
 		
