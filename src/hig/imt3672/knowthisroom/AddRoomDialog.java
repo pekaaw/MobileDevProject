@@ -2,12 +2,15 @@ package hig.imt3672.knowthisroom;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.EditText;
+import android.widget.Toast;
 
 public class AddRoomDialog extends DialogFragment implements View.OnClickListener {
 	
@@ -50,13 +53,16 @@ public class AddRoomDialog extends DialogFragment implements View.OnClickListene
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()) {
-			case R.id.add_room_cancel :
-				dismiss();
-				communicator.onAddRoomNameRecieved("Hello from CANCEL?");
-				break;
 			case R.id.add_room_ok :
 				dismiss();
-				communicator.onAddRoomNameRecieved("Hello from OK?");
+				EditText namefield = (EditText) m_view.findViewById(R.id.add_room_name);
+				String name = namefield.getText().toString();
+				communicator.onAddRoomNameRecieved(name);
+				break;
+			case R.id.add_room_cancel :
+				dismiss();
+				Toast.makeText( ( getActivity() ), "No room added.", Toast.LENGTH_LONG).show();
+				//communicator.onAddRoomNameRecieved("Hello from OK?");
 				break;
 		}
 	} // end onClick

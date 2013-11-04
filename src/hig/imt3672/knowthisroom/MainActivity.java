@@ -19,7 +19,6 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 	ArrayAdapter<DBRoomEntry> adapter_room_list;
 	DBOperator database;
 	
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -129,6 +128,10 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 		if( name.length() < 0 || name.length() > 128 ) {
 			return;
 		}
+		
+		database.createRoom(name);
+		list_of_rooms = database.getAllDBRoomEntries();
+		adapter_room_list.notifyDataSetChanged();
 		
 		
 		// TODO: Add name to new instance, then add celltower and wifi networks.
