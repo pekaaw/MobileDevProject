@@ -39,30 +39,6 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 		// Let us start the CellTowerHandler service
 		startService(new Intent(this, CellTowerHandler.class));
 
-		// "Add room"-button: Assign onClick-event
-		findViewById(R.id.add_room_btn)
-			.setOnClickListener( new View.OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-						
-					// For adding a room, open dialog to supply name
-					addRoomNameDialog(v);
-				}
-				
-			});
-		
-		// "Delete room"-button: Assign onClick-event
-		findViewById(R.id.delete_room_btn)
-			.setOnClickListener( new View.OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					
-					// For deleting a room, open a dialog to confirm
-					deleteRoomDialog(v);
-				}
-			});
 	}
 	
 	@Override
