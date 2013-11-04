@@ -47,7 +47,7 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				DBRoomEntry room = (DBRoomEntry) parent.getItemAtPosition(position);
 				database.deleteRoom(room);
-				adapter_room_list.notifyDataSetChanged();
+				adapter_room_list.remove(room);
 				Toast.makeText(getApplicationContext(), "The room: '" + room.getName() + "' is deleted.", Toast.LENGTH_LONG).show();				
 			}
 		});
