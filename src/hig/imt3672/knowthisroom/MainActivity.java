@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -39,6 +41,16 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 		// Let us start the CellTowerHandler service
 		startService(new Intent(this, CellTowerHandler.class));
 
+		// Roomlist onclick-events
+		listView.setOnItemClickListener( new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				DBRoomEntry room = (DBRoomEntry) parent.getItemAtPosition(position);
+				database.deleteRoom(room);
+				adapter_room_list.notifyDataSetChanged();
+				Toast.makeText(getApplicationContext(), "The room: '" + room.getName() + "' is deleted.", Toast.LENGTH_LONG).show();				
+			}
+		});
 	}
 	
 	@Override
@@ -105,15 +117,21 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 			return;
 		}
 		
-		database.createRoom(name);
+		DBRoomEntry addedRoom = database.createRoom(name);
+		
+		// respond: Message if not created, else put it into list
+		if( addedRoom == null ) {
+			Toast.makeText(this, "Room failed to be created.", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
 		list_of_rooms = database.getAllDBRoomEntries();
-		adapter_room_list.notifyDataSetChanged();
+		adapter_room_list.insert(addedRoom, 0);
 		
 		
 		// TODO: Add name to new instance, then add celltower and wifi networks.
 		
 		// Toast to debug purposes. To be deleted..
-		Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
 	}
 
 	/**
