@@ -11,6 +11,15 @@ import android.view.Window;
 public class DeleteRoomDialog extends DialogFragment implements View.OnClickListener{
 	
 	Communicator communicator;
+	DBRoomEntry m_room;
+	
+	public DeleteRoomDialog() {
+		m_room = null;
+	}
+	
+	public void initiate( DBRoomEntry room ) {
+		m_room = room;
+	}
 	
 	@Override
 	public void onStart() {
@@ -40,19 +49,19 @@ public class DeleteRoomDialog extends DialogFragment implements View.OnClickList
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()) {
-		case R.id.delete_room_cancel :
-			dismiss();
-			communicator.onDeleteCommandReceived(false);	// Do not delete!
-			break;
 		case R.id.delete_room_ok :
 			dismiss();
-			communicator.onDeleteCommandReceived(true);		// Deletion is hereby done!
+			communicator.onDeleteCommandReceived(true, m_room);		// Deletion is hereby done!
+			break;
+		case R.id.delete_room_cancel :
+			dismiss();
+			communicator.onDeleteCommandReceived(false, null);	// Do not delete!
 			break;
 
 		}
 	}
 	
 	interface Communicator {
-		public void onDeleteCommandReceived(Boolean command);
+		public void onDeleteCommandReceived(Boolean command, DBRoomEntry room);
 	}
 }

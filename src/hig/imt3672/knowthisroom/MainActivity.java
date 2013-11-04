@@ -46,9 +46,7 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				DBRoomEntry room = (DBRoomEntry) parent.getItemAtPosition(position);
-				database.deleteRoom(room);
-				adapter_room_list.remove(room);
-				Toast.makeText(getApplicationContext(), "The room: '" + room.getName() + "' is deleted.", Toast.LENGTH_LONG).show();				
+				deleteRoomDialog(view, room);
 			}
 		});
 	}
@@ -93,9 +91,10 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 		addRoomDialog.show(manager, "add_room_dialog_id");
 	}
 	
-	public void deleteRoomDialog(View view) {
+	public void deleteRoomDialog(View view, DBRoomEntry room) {
 		FragmentManager manager = getFragmentManager();
 		DeleteRoomDialog deleteRoomDialog = new DeleteRoomDialog();
+		deleteRoomDialog.initiate(room);
 		deleteRoomDialog.show(manager, "delete_room_dialog_id");
 		
 	}
@@ -144,8 +143,13 @@ public class MainActivity extends FragmentActivity implements AddRoomDialog.Comm
 	 * @param command True upon deletion, otherwise false.
 	 */
 	@Override
-	public void onDeleteCommandReceived(Boolean command) {
+	public void onDeleteCommandReceived(Boolean command, DBRoomEntry room) {
 		if( command == true ) {
+			
+			database.deleteRoom(room);
+			adapter_room_list.remove(room);
+			Toast.makeText(this, "The room: '" + room.getName() + "' is deleted.", Toast.LENGTH_LONG).show();				
+
 //			delete();	// To delete room. Remember: the identity of the room must be found somewhere...
 		}
 	}
