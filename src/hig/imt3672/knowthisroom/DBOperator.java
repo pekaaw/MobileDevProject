@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.wifi.ScanResult;
 
 public class DBOperator { // Handles normal usage of the database
 
@@ -80,9 +81,13 @@ public class DBOperator { // Handles normal usage of the database
 						+ insertId, null, null, null, null);
 
 		// for each wifi {
-		String wifiBSID = "42";
-		long wifiStrength = 42;
-		insertWifi(wifiBSID, insertId, wifiStrength);
+		WifiSensor wifi = new WifiSensor();
+		List<ScanResult> networks = wifi.GetNetworks();
+		
+		for(int i = 0; i <= networks.size();i++) {
+			insertWifi(networks.get(i).BSSID, insertId, networks.get(i).level);
+		}
+		
 		// }
 
 		// for each celltower {
