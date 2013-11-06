@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 
 public class DBOperator { // Handles normal usage of the database
 
@@ -86,8 +87,10 @@ public class DBOperator { // Handles normal usage of the database
 		// }
 
 		// for each celltower {
-		long cellTowerId = 42;
-		long towerStrength = 42;
+		CellTowerHandler cellTower = new CellTowerHandler();
+		Bundle cellTowerBundle = cellTower.getTowerInfo();
+		long cellTowerId = cellTowerBundle.getLong("CellID");
+		long towerStrength = cellTowerBundle.getLong("Strength");
 		insertCell(cellTowerId, insertId, towerStrength);
 		// }
 
