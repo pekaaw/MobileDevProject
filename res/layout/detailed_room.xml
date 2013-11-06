@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/detailed_room"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:textSize="@dimen/font_size"
+        android:text="@string/add_room_instruction" />
+
+    <TextView
+        android:id="@+id/detailed_room_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/detailed_room"
+        android:textSize="@dimen/font_size"
+        android:text="@string/app_name" />
+    
+    <TextView
+        android:id="@+id/detailed_tower_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/detailed_room"
+		android:textSize="@dimen/font_size"
+        android:text="@string/detailed_tower_header" />
+
+    <ListView
+        android:id="@+id/detailed_celltower_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/detailed_tower_header" />
+  
+    <TextView
+        android:id="@+id/detailed_wifi_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/detailed_celltower_list"
+        android:text="@string/detailed_wifi_header"
+        android:textSize="@dimen/font_size" />
+
+    <ListView
+        android:id="@+id/detailed_wifi_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/detailed_wifi_header" />
+  
+</RelativeLayout>
