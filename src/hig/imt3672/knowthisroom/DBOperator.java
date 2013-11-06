@@ -71,7 +71,7 @@ public class DBOperator { // Handles normal usage of the database
 		return true;
 	}
 
-	public DBRoomEntry createRoom(String room) {
+	public DBRoomEntry createRoom(String room, Bundle cellTowerBundle) {
 		ContentValues roomValues = new ContentValues();
 		roomValues.put(ExtendedSQLLiteHelper.ROOM_COLUMN_NAME, room);
 		long insertId = database.insert(ExtendedSQLLiteHelper.ROOM_TABLE, null,
@@ -87,10 +87,8 @@ public class DBOperator { // Handles normal usage of the database
 		// }
 
 		// for each celltower {
-		CellTowerHandler cellTower = new CellTowerHandler();
-		Bundle cellTowerBundle = cellTower.getTowerInfo();
-		long cellTowerId = cellTowerBundle.getLong("CellID");
-		long towerStrength = cellTowerBundle.getLong("Strength");
+		long cellTowerId = cellTowerBundle.getInt("CellID");
+		long towerStrength = cellTowerBundle.getInt("Strength");
 		insertCell(cellTowerId, insertId, towerStrength);
 		// }
 
