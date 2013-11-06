@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.wifi.ScanResult;
 import android.os.Bundle;
 
 public class DBOperator { // Handles normal usage of the database
@@ -81,9 +82,13 @@ public class DBOperator { // Handles normal usage of the database
 						+ insertId, null, null, null, null);
 
 		// for each wifi {
-		String wifiBSID = "42";
-		long wifiStrength = 42;
-		insertWifi(wifiBSID, insertId, wifiStrength);
+		WifiSensor wifi = new WifiSensor();
+		List<ScanResult> networks = wifi.GetNetworks();
+
+		for (int i = 0; i <= networks.size(); i++) {
+			insertWifi(networks.get(i).BSSID, insertId, networks.get(i).level);
+		}
+
 		// }
 
 		// for each celltower {
@@ -114,16 +119,21 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	public void updateRoom(DBRoomEntry room) {
-		// TO DO ::: OR NOT TO DO
+		WifiSensor wifi = new WifiSensor();
+		List<ScanResult> networks = wifi.GetNetworks();
+
+		for (int i = 0; i <= networks.size(); i++) {
+			updateWifi(networks.get(i).BSSID, room.getId(),
+					networks.get(i).level);
+		}
 
 	}
 
-	public boolean updateWifi(DBRoomEntry room, String BSID, long signalStrenght) {
+	public boolean updateWifi(String BSID, long roomId, int signalStrenght) {
 
 		// CHECK IF THE WIFI EXISTS BEFORE YOU RUN THIS FUNCTION
 
 		ContentValues cellValues = new ContentValues();
-		long roomId = room.getId();
 		// Database sql get-statements
 		String WIFI_GET_MAX = ("SELECT "
 				+ ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MAX + " FROM "

@@ -65,6 +65,7 @@ public class CellTowerHandler extends Service implements Observer {
 		@Override
 		public void onSignalStrengthsChanged(SignalStrength strength) {
 			// each time there is an update, get the signal strength
+
 			mCellTowerData.setSignalStrength(strength);
 			// TODO debugging
 			Log.d("########", "Signal strength "
@@ -74,6 +75,7 @@ public class CellTowerHandler extends Service implements Observer {
 
 		@Override
 		public void onCellLocationChanged(CellLocation location) {
+
 			mCellTowerData.setCellLocation(location);
 			// TODO debugging
 			Log.d("########", "Cell Location "
@@ -83,7 +85,9 @@ public class CellTowerHandler extends Service implements Observer {
 
 		@Override
 		public void onServiceStateChanged(ServiceState serviceState) {
+
 			mCellTowerData.setServiceState(serviceState);
+
 			// TODO debugging
 			Log.d("########",
 					"Service State " + serviceState.getOperatorAlphaLong()

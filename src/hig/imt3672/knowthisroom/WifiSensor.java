@@ -22,30 +22,32 @@ import android.net.wifi.WifiManager;
 import android.util.Log;
 
 public class WifiSensor {
-	
+
 	WifiManager wifi;
 	List<ScanResult> networks;
-	
-	/*TIP:
-	 * For info on ScanResult:
+
+	/*
+	 * TIP: For info on ScanResult:
 	 * http://developer.android.com/reference/android/net/wifi/ScanResult.html
 	 */
-	
+
 	public List<ScanResult> GetNetworks() {
 
-		Log.d ("WifiSensor","Filling list.");
+		Log.d("WifiSensor", "Filling list.");
 		networks = wifi.getScanResults();
 
-		Log.i ("WifiSensor","There are " + Integer.toString(networks.size()) + " networks.");
-		
-		//Sorts by the BSSID of the ScanResults.
+		Log.i("WifiSensor", "There are " + Integer.toString(networks.size())
+				+ " networks.");
+
+		// Sorts by the BSSID of the ScanResults.
 		Collections.sort(networks, new Comparator<ScanResult>() {
 			public int compare(ScanResult s1, ScanResult s2) {
 				return s1.BSSID.compareToIgnoreCase(s2.BSSID);
 			}
 		});
 
-		Log.i ("WifiSensor","Sorted " + Integer.toString(networks.size()) + " networks.");
+		Log.i("WifiSensor", "Sorted " + Integer.toString(networks.size())
+				+ " networks.");
 		return networks;
 	}
 }
