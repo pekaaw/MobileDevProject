@@ -46,12 +46,11 @@ public class MainActivity extends FragmentActivity implements
 		startService(new Intent(this, CellTowerHandler.class));
 
 		// Roomlist onclick-events
-		listView.setOnItemClickListener(new OnItemClickListener() {
+		listView.setOnItemClickListener( new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				DBRoomEntry room = (DBRoomEntry) parent
-						.getItemAtPosition(position);
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				
+				DBRoomEntry room = (DBRoomEntry) parent.getItemAtPosition(position);
 				deleteRoomDialog(view, room);
 			}
 		});

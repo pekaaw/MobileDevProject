@@ -81,13 +81,13 @@ public class DBOperator { // Handles normal usage of the database
 				allRooms, ExtendedSQLLiteHelper.ROOM_COLUMN_ID + " = "
 						+ insertId, null, null, null, null);
 
-		// for each wifi {
-		WifiSensor wifi = new WifiSensor();
-		List<ScanResult> networks = wifi.GetNetworks();
-
-		for (int i = 0; i <= networks.size(); i++) {
-			insertWifi(networks.get(i).BSSID, insertId, networks.get(i).level);
-		}
+//		// for each wifi {
+//		WifiSensor wifi = new WifiSensor();
+//		List<ScanResult> networks = wifi.GetNetworks();
+//
+//		for (int i = 0; i <= networks.size(); i++) {
+//			insertWifi(networks.get(i).BSSID, insertId, networks.get(i).level);
+//		}
 
 		// }
 
