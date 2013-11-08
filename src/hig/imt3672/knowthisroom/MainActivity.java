@@ -42,8 +42,8 @@ public class MainActivity extends FragmentActivity implements
 		ListView listView = (ListView) findViewById(R.id.listRooms);
 		listView.setAdapter(adapter_room_list);
 
-		// Let us start the CellTowerHandler service
-		startService(new Intent(this, CellTowerHandler.class));
+//		// Let us start the CellTowerHandler service
+//		startService(new Intent(this, CellTowerHandler.class));
 
 		// Roomlist onclick-events
 		listView.setOnItemClickListener( new OnItemClickListener() {
