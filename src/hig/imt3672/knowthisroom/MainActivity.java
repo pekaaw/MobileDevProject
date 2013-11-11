@@ -3,6 +3,7 @@ package hig.imt3672.knowthisroom;
 import java.util.List;
 
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,6 +21,8 @@ import android.widget.Toast;
 public class MainActivity extends FragmentActivity implements
 		AddRoomDialog.Communicator, DeleteRoomDialog.Communicator {
 
+	ListRoomFragment listRoomFragment;
+	DetailFragment detailedFragment;
 	List<DBRoomEntry> list_of_rooms;
 	ArrayAdapter<DBRoomEntry> adapter_room_list;
 	Bundle gsmCellData;
@@ -29,6 +32,15 @@ public class MainActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		listRoomFragment = new ListRoomFragment();
+		detailedFragment = new DetailFragment();
+				
+		FragmentTransaction fragmentAction = getFragmentManager().beginTransaction();
+		fragmentAction.add(R.id.main_fragment_frame, listRoomFragment);
+		fragmentAction.addToBackStack(null);
+		fragmentAction.commit();
+		
 
 		// get a handle to a database and open it.
 		database = new DBOperator(this);
@@ -39,7 +51,17 @@ public class MainActivity extends FragmentActivity implements
 		adapter_room_list = new ArrayAdapter<DBRoomEntry>(this,
 				android.R.layout.simple_list_item_1, list_of_rooms);
 
-		ListView listView = (ListView) findViewById(R.id.listRooms);
+		// We create a GsmService intent and start it here:
+		final GSMResultReceiver resultReceiver = new GSMResultReceiver(null);
+		final Intent i = new Intent(this, CellTowerHandler.class);
+		i.putExtra("receiver", resultReceiver);
+		startService(i);
+	}
+
+	@Override
+	protected void onStart() {
+
+		ListView listView = (ListView) listRoomFragment.getView().findViewById(R.id.listRooms);
 		listView.setAdapter(adapter_room_list);
 
 //		// Let us start the CellTowerHandler service
@@ -50,21 +72,31 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				
+				FragmentTransaction fragmentAction = getFragmentManager().beginTransaction();
+				fragmentAction.addToBackStack(null);
+				fragmentAction.replace(R.id.main_fragment_frame, detailedFragment);
+				fragmentAction.commit();
+			
 				DBRoomEntry room = (DBRoomEntry) parent.getItemAtPosition(position);
-				deleteRoomDialog(view, room);
+				detailedFragment.setRoom(room);
+
+//				TextView roomName = (TextView) listRoomFragment.getView().findViewById(R.id.detailed_room_name);
+//				roomName.setText(room.getName());
+				
+//				Log.d("pkdata","detailedFragment: " + ((detailedFragment == null) ? "null" : "not null"));
+//				
+//				Log.d("pkdata", "room: " + ((room != null) ? "not null" : "null" ) + "ting");
+//				try {
+//					detailedFragment.setRoom(room);
+//				}
+//				catch (Exception e) {
+//					Log.d("pkdata", "setRoom: " + e.getMessage());
+//				}
+				
+			//	deleteRoomDialog(view, room);
 			}
 		});
-
-		// We create a GsmService intent and start it here:
-		final GSMResultReceiver resultReceiver = new GSMResultReceiver(null);
-		final Intent i = new Intent(this, CellTowerHandler.class);
-		i.putExtra("receiver", resultReceiver);
-		startService(i);
-	}
-
-	@Override
-	protected void onStart() {
-		// TODO Auto-generated method stub
+		
 		super.onStart();
 	}
 
