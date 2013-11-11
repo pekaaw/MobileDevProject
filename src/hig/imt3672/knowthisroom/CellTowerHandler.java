@@ -33,10 +33,24 @@ public class CellTowerHandler extends Service implements Observer {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		if ( intent == null ) {
+			Log.d("###", "Service started with a null-intent");
+			return START_NOT_STICKY;
+			// START_NOT_STICKY means that when the calling activity
+			// shuts down, the service will shut down as well.
+			// When we want our service to continue, we want
+			// START_STICKY so that the service sticks around in the
+			// system, but the intent will then be called with a
+			// intent like a nullptr. this will of course give a
+			// nullpointerexception so we need to handle it with 
+			// this if =D
+		}
 		setup(intent);
 		// TODO remove the logging outputs for production
 		Log.d("########", "CellTowerHandler Service Started");
-		return Service.START_STICKY;
+		return Service.START_NOT_STICKY;
+		// Should be Service.START_STICKY; when we want the service to
+		// hang around.
 	}
 
 	private void setup(Intent intent) {
