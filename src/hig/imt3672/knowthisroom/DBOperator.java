@@ -18,6 +18,8 @@ public class DBOperator { // Handles normal usage of the database
 	private ExtendedSQLLiteHelper dbHelper;
 	private String[] allRooms = { ExtendedSQLLiteHelper.ROOM_COLUMN_ID,
 			ExtendedSQLLiteHelper.ROOM_COLUMN_NAME };
+	private String[] roomsById = { ExtendedSQLLiteHelper.ROOM_COLUMN_ID,
+			ExtendedSQLLiteHelper.ROOM_COLUMN_NAME };
 
 	public DBOperator(Context context) {
 		dbHelper = new ExtendedSQLLiteHelper(context);
@@ -81,13 +83,13 @@ public class DBOperator { // Handles normal usage of the database
 				allRooms, ExtendedSQLLiteHelper.ROOM_COLUMN_ID + " = "
 						+ insertId, null, null, null, null);
 
-//		// for each wifi {
-//		WifiSensor wifi = new WifiSensor();
-//		List<ScanResult> networks = wifi.GetNetworks();
-//
-//		for (int i = 0; i <= networks.size(); i++) {
-//			insertWifi(networks.get(i).BSSID, insertId, networks.get(i).level);
-//		}
+		// // for each wifi {
+		// WifiSensor wifi = new WifiSensor();
+		// List<ScanResult> networks = wifi.GetNetworks();
+		//
+		// for (int i = 0; i <= networks.size(); i++) {
+		// insertWifi(networks.get(i).BSSID, insertId, networks.get(i).level);
+		// }
 
 		// }
 
@@ -154,10 +156,10 @@ public class DBOperator { // Handles normal usage of the database
 
 		Cursor cursor = database.rawQuery(WIFI_GET_MAX, new String[] { BSID,
 				String(roomId) });
-		long DBmax = cursorToNumber(cursor);
+		long DBmax = cursorToWifiStr(cursor);
 		cursor = database.rawQuery(WIFI_GET_MIN, new String[] { BSID,
 				String(roomId) });
-		long DBmin = cursorToNumber(cursor);
+		long DBmin = cursorToWifiStr(cursor);
 
 		if (signalStrenght > DBmax) {
 			cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MAX,
@@ -200,10 +202,10 @@ public class DBOperator { // Handles normal usage of the database
 
 		Cursor cursor = database.rawQuery(CELLTOWER_GET_MAX, new String[] {
 				String(cellId), String(roomId) });
-		long DBmax = cursorToNumber(cursor);
+		long DBmax = cursorToCellStr(cursor);
 		cursor = database.rawQuery(CELLTOWER_GET_MIN, new String[] {
 				String(cellId), String(roomId) });
-		long DBmin = cursorToNumber(cursor);
+		long DBmin = cursorToCellStr(cursor);
 
 		if (signalStrenght > DBmax) {
 			cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MAX,
@@ -242,6 +244,20 @@ public class DBOperator { // Handles normal usage of the database
 		return rooms;
 	}
 
+	// :::::::::::::::Cursors::::::::::::::::::::::::::::
+	private long cursorToID(Cursor cursor) {
+		return cursor.getLong(0);
+	}
+
+	private long cursorToCellStr(Cursor cursor) {
+		return cursor.getLong(1);
+	}
+
+	private long cursorToWifiStr(Cursor cursor) {
+		return cursor.getLong(2);
+	}
+
+	// :::::::cursor for rooms::::::::::
 	private DBRoomEntry cursorToDBRoomEntry(Cursor cursor) {
 		DBRoomEntry room = new DBRoomEntry();
 		room.setId(cursor.getLong(0));
@@ -249,8 +265,67 @@ public class DBOperator { // Handles normal usage of the database
 		return room;
 	}
 
-	private long cursorToNumber(Cursor cursor) {
-		return cursor.getLong(0);
+	// ::::::::cursor for towers:::::::::::
+	public List<DBCelltowerEntry> getCellTowers(long roomId) {
+		List<DBCelltowerEntry> returnList = new ArrayList<DBCelltowerEntry>();
+
+		String whereStatement = (ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
+				+ "=" + String(roomId));
+
+		Cursor cursor = database.query(ExtendedSQLLiteHelper.CELLTOWER_TABLE,
+				null, whereStatement, null, null, null, null);
+
+		cursor.moveToFirst();
+		while (!cursor.isAfterLast()) {
+			DBCelltowerEntry tower = cursorToDBCelltowerEntry(cursor);
+			returnList.add(tower);
+			cursor.moveToNext();
+		}
+		// Make sure to close the cursor
+		cursor.close();
+
+		return returnList;
+
 	}
+
+	private DBCelltowerEntry cursorToDBCelltowerEntry(Cursor cursor) {
+		DBCelltowerEntry tower = new DBCelltowerEntry();
+		tower.setId(cursor.getLong(0));
+		tower.setStr(cursor.getLong(1));
+		tower.setRoom(cursor.getLong(2));
+		return tower;
+	}
+
+	// :::::::::cursor for rooms::::::::::
+	public List<DBWifiInRoomEntry> getWifi(long roomId) {
+		List<DBWifiInRoomEntry> returnList = new ArrayList<DBWifiInRoomEntry>();
+
+		String whereStatement = (ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
+				+ "=" + String(roomId));
+
+		Cursor cursor = database.query(ExtendedSQLLiteHelper.CELLTOWER_TABLE,
+				null, whereStatement, null, null, null, null);
+
+		cursor.moveToFirst();
+		while (!cursor.isAfterLast()) {
+			DBWifiInRoomEntry wifi = cursorToDBWifiInRoomEntry(cursor);
+			returnList.add(wifi);
+			cursor.moveToNext();
+		}
+		// Make sure to close the cursor
+		cursor.close();
+
+		return returnList;
+
+	}
+
+	private DBWifiInRoomEntry cursorToDBWifiInRoomEntry(Cursor cursor) {
+		DBWifiInRoomEntry wifi = new DBWifiInRoomEntry();
+		wifi.setId(cursor.getString(0));
+		wifi.setStr(cursor.getLong(1));
+		wifi.setRoom(cursor.getLong(2));
+		return wifi;
+	}
+
 	// :::::::::::LIST TYPE SPESIFIC END:::::::::::::::
 }
