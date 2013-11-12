@@ -26,25 +26,32 @@ import android.net.wifi.WifiManager;
 import android.util.Log;
 
 public class WifiSensor {
+	static WifiSensor mInstance;
+	
 	Context mContext;
 	WifiManager wifi;
 	List<ScanResult> networks;
-	static WifiSensor mInstance;
+	int size;
 	
 	public static WifiSensor getInstance() {
 		if(mInstance == null) {
-			mInstance = new WifiSensor();
+			Log.d("WifiSensor","You have not created an instance.");
+			return null;
 		}
 		return mInstance;
 	}
 	
-	private WifiSensor() {
-		mContext = null;
-		networks = null;
+	public static void createInstance(Context context) {
+		if(mInstance != null) {
+			Log.d("WifiSensor","An instance already exists.");
+			return;
+		}
+		mInstance = new WifiSensor(context);
 	}
 	
-	public void setContext(Context context) {
-		mContext = context;
+	private WifiSensor(Context context) {
+		mContext = context.getApplicationContext();
+		wifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
 	}
 	
 	/*
@@ -58,17 +65,21 @@ public class WifiSensor {
 			return null;
 		}
 		
+		wifi.startScan();
+		
 		Log.d("WifiSensor", "Registering listener.");
 		mContext.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context c, Intent intent) 
             {
+        		Log.d("WifiSensor", "Networks found!");
             	networks = wifi.getScanResults();
+            	size = networks.size();
             }
         }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 		
-		Log.d("WifiSensor","Networks: " + Integer.toString(networks.size()));
-		if(networks.size() != 0) {
+		Log.d("WifiSensor","Networks: " + Integer.toString(size));
+		if(size != 0) {
 			// Sorts by the BSSID of the ScanResults.
 			Collections.sort(networks, new Comparator<ScanResult>() {
 				public int compare(ScanResult s1, ScanResult s2) {
@@ -80,5 +91,9 @@ public class WifiSensor {
 					+ " networks.");
 		}
 		return networks;
+	}
+	
+	public int GetSize() {
+		return size;
 	}
 }

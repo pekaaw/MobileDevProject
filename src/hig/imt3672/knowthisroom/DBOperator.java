@@ -83,15 +83,15 @@ public class DBOperator { // Handles normal usage of the database
 				allRooms, ExtendedSQLLiteHelper.ROOM_COLUMN_ID + " = "
 						+ insertId, null, null, null, null);
 
-		// // for each wifi {
-		// WifiSensor wifi = new WifiSensor();
-		// List<ScanResult> networks = wifi.GetNetworks();
-		//
-		// for (int i = 0; i <= networks.size(); i++) {
-		// insertWifi(networks.get(i).BSSID, insertId, networks.get(i).level);
-		// }
-
-		// }
+		//  for each wifi {
+		WifiSensor wifi = WifiSensor.getInstance();
+		List<ScanResult> networks = wifi.GetNetworks();
+		
+		if(wifi.GetSize() != 0) {
+			for (int i = 0; i <= networks.size(); i++) {
+				insertWifi(networks.get(i).BSSID, insertId, networks.get(i).level);
+			}
+		}
 
 		// for each celltower {
 		long cellTowerId = cellTowerBundle.getInt("CellID");
@@ -121,7 +121,7 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	public void updateRoom(DBRoomEntry room) {
-		WifiSensor wifi = new WifiSensor();
+		WifiSensor wifi = WifiSensor.getInstance();
 		List<ScanResult> networks = wifi.GetNetworks();
 
 		for (int i = 0; i <= networks.size(); i++) {
