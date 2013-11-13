@@ -18,8 +18,6 @@ public class DBOperator { // Handles normal usage of the database
 	private ExtendedSQLLiteHelper dbHelper;
 	private String[] allRooms = { ExtendedSQLLiteHelper.ROOM_COLUMN_ID,
 			ExtendedSQLLiteHelper.ROOM_COLUMN_NAME };
-	private String[] roomsById = { ExtendedSQLLiteHelper.ROOM_COLUMN_ID,
-			ExtendedSQLLiteHelper.ROOM_COLUMN_NAME };
 
 	public DBOperator(Context context) {
 		dbHelper = new ExtendedSQLLiteHelper(context);
@@ -83,13 +81,14 @@ public class DBOperator { // Handles normal usage of the database
 				allRooms, ExtendedSQLLiteHelper.ROOM_COLUMN_ID + " = "
 						+ insertId, null, null, null, null);
 
-		//  for each wifi {
+		// for each wifi {
 		WifiSensor wifi = WifiSensor.getInstance();
 		List<ScanResult> networks = wifi.GetNetworks();
-		
-		if(wifi.GetSize() != 0) {
+
+		if (wifi.GetSize() != 0) {
 			for (int i = 0; i < networks.size(); i++) {
-				insertWifi(networks.get(i).BSSID, insertId, networks.get(i).level);
+				insertWifi(networks.get(i).BSSID, insertId,
+						networks.get(i).level);
 			}
 		}
 
@@ -266,6 +265,33 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	// ::::::::cursor for towers:::::::::::
+	public boolean cellExists(long roomId, long ID) {
+		List<DBCelltowerEntry> list = new ArrayList<DBCelltowerEntry>();
+
+		String whereStatement = (ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
+				+ "=" + String(roomId) + "AND"
+				+ ExtendedSQLLiteHelper.CELLTOWER_COLUMN_TOWER_ID + "=" + ID);
+
+		Cursor cursor = database.query(ExtendedSQLLiteHelper.CELLTOWER_TABLE,
+				null, whereStatement, null, null, null, null);
+
+		cursor.moveToFirst();
+		while (!cursor.isAfterLast()) {
+			DBCelltowerEntry tower = cursorToDBCelltowerEntry(cursor);
+			list.add(tower);
+			cursor.moveToNext();
+		}
+		// Make sure to close the cursor
+		cursor.close();
+
+		if (list.size() > 1)
+			return true; // error more than one hit
+		else if (list.size() == 1)
+			return true; // one hit
+		else
+			return false;// no hits in database
+	}
+
 	public List<DBCelltowerEntry> getCellTowers(long roomId) {
 		List<DBCelltowerEntry> returnList = new ArrayList<DBCelltowerEntry>();
 
@@ -296,7 +322,7 @@ public class DBOperator { // Handles normal usage of the database
 		return tower;
 	}
 
-	// :::::::::cursor for rooms::::::::::
+	// :::::::::cursor for wifi::::::::::
 	public List<DBWifiInRoomEntry> getWifi(long roomId) {
 		List<DBWifiInRoomEntry> returnList = new ArrayList<DBWifiInRoomEntry>();
 
@@ -317,6 +343,35 @@ public class DBOperator { // Handles normal usage of the database
 
 		return returnList;
 
+	}
+
+	public boolean wifiExists(long roomId, String BsID) {
+		// i was hoping to do this on the server but i can't find a way to do
+		// that
+		List<DBWifiInRoomEntry> list = new ArrayList<DBWifiInRoomEntry>();
+
+		String whereStatement = (ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
+				+ "=" + String(roomId) + "AND"
+				+ ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_WIFI_ID + "=" + BsID);
+
+		Cursor cursor = database.query(ExtendedSQLLiteHelper.CELLTOWER_TABLE,
+				null, whereStatement, null, null, null, null);
+
+		cursor.moveToFirst();
+		while (!cursor.isAfterLast()) {
+			DBWifiInRoomEntry wifi = cursorToDBWifiInRoomEntry(cursor);
+			list.add(wifi);
+			cursor.moveToNext();
+		}
+		// Make sure to close the cursor
+		cursor.close();
+
+		if (list.size() > 1)
+			return true; // error more than one hit
+		else if (list.size() == 1)
+			return true; // one hit
+		else
+			return false;// no hits in database
 	}
 
 	private DBWifiInRoomEntry cursorToDBWifiInRoomEntry(Cursor cursor) {
