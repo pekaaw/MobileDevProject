@@ -53,7 +53,7 @@ public class MainActivity extends FragmentActivity implements
 		final Intent i = new Intent(this, CellTowerHandler.class);
 		i.putExtra("receiver", resultReceiver);
 		startService(i);
-		//WifiSensor.createInstance(this);
+		WifiSensor.createInstance(this);
 	}
 
 	@Override
