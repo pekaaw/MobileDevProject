@@ -88,7 +88,7 @@ public class DBOperator { // Handles normal usage of the database
 		List<ScanResult> networks = wifi.GetNetworks();
 		
 		if(wifi.GetSize() != 0) {
-			for (int i = 0; i <= networks.size(); i++) {
+			for (int i = 0; i < networks.size(); i++) {
 				insertWifi(networks.get(i).BSSID, insertId, networks.get(i).level);
 			}
 		}
