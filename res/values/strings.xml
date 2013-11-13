@@ -7,6 +7,7 @@
     <string name="delete_room">Delete room</string>
     <string name="add_room_instruction">Room name:</string>
     <string name="delete_room_headline">Really delete room?</string>
+    <string name="detailed_room_headline">"Details of "</string>
     <string name="detailed_tower_header">CellTower info:</string>
     <string name="detailed_wifi_header">Wifi info:</string>
     

@@ -35,8 +35,8 @@ public class DetailFragment extends Fragment {
 					
 				}
 			});
-			super.onActivityCreated(savedInstanceState);
 		}
+		super.onActivityCreated(savedInstanceState);
 	}
 
 	public void setRoom(DBRoomEntry room) {

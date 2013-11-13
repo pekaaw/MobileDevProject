@@ -72,13 +72,14 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				
-				FragmentTransaction fragmentAction = getFragmentManager().beginTransaction();
-				fragmentAction.addToBackStack(null);
-				fragmentAction.replace(R.id.main_fragment_frame, detailedFragment);
-				fragmentAction.commit();
-			
 				DBRoomEntry room = (DBRoomEntry) parent.getItemAtPosition(position);
-				detailedFragment.setRoom(room);
+				detailedRoomDialog(view, room);
+//				FragmentTransaction fragmentAction = getFragmentManager().beginTransaction();
+//				fragmentAction.add(R.id.main_fragment_frame, detailedFragment);
+//				fragmentAction.commit();
+//			
+//				DBRoomEntry room = (DBRoomEntry) parent.getItemAtPosition(position);
+//				detailedFragment.setRoom(room);
 
 //				TextView roomName = (TextView) listRoomFragment.getView().findViewById(R.id.detailed_room_name);
 //				roomName.setText(room.getName());
@@ -140,7 +141,13 @@ public class MainActivity extends FragmentActivity implements
 		DeleteRoomDialog deleteRoomDialog = new DeleteRoomDialog();
 		deleteRoomDialog.initiate(room);
 		deleteRoomDialog.show(manager, "delete_room_dialog_id");
-
+	}
+	
+	public void detailedRoomDialog(View view, DBRoomEntry room) {
+		FragmentManager manager = getFragmentManager();
+		DetailsRoomDialog detailsRoomDialog = new DetailsRoomDialog();
+		detailsRoomDialog.initiate(room);
+		detailsRoomDialog.show(manager, "detailed_room_dialog_id");
 	}
 
 	/**
