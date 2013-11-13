@@ -52,6 +52,7 @@ public class WifiSensor {
 	private WifiSensor(Context context) {
 		mContext = context.getApplicationContext();
 		wifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+		if(!wifi.isWifiEnabled()) {wifi.setWifiEnabled(true);}
 		wifi.startScan();
 		
 		Log.d("WifiSensor", "Registering listener.");
