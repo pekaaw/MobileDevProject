@@ -52,6 +52,20 @@ public class WifiSensor {
 	private WifiSensor(Context context) {
 		mContext = context.getApplicationContext();
 		wifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+		if(!wifi.isWifiEnabled()) {wifi.setWifiEnabled(true);}
+		wifi.startScan();
+		
+		Log.d("WifiSensor", "Registering listener.");
+		mContext.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context c, Intent intent) 
+            {
+        		Log.d("WifiSensor", "Networks found!");
+            	networks = wifi.getScanResults();
+            	size = networks.size();
+        		Log.d("WifiSensor", "Networks: " + Integer.toString(size));
+            }
+        }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 	}
 	
 	/*
@@ -64,19 +78,6 @@ public class WifiSensor {
 			Log.d("WifiSensor", "No context provided. Returning.");
 			return null;
 		}
-		
-		wifi.startScan();
-		
-		Log.d("WifiSensor", "Registering listener.");
-		mContext.registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context c, Intent intent) 
-            {
-        		Log.d("WifiSensor", "Networks found!");
-            	networks = wifi.getScanResults();
-            	size = networks.size();
-            }
-        }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 		
 		Log.d("WifiSensor","Networks: " + Integer.toString(size));
 		if(size != 0) {

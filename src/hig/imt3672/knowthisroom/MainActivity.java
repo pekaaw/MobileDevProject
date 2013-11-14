@@ -20,6 +20,7 @@ import android.widget.Toast;
 public class MainActivity extends FragmentActivity implements
 		AddRoomDialog.Communicator, DeleteRoomDialog.Communicator {
 
+//	ListRoomFragment listRoomFragment;
 	List<DBRoomEntry> list_of_rooms;
 	ArrayAdapter<DBRoomEntry> adapter_room_list;
 	Bundle gsmCellData;
@@ -29,6 +30,14 @@ public class MainActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+//		listRoomFragment = new ListRoomFragment();
+//				
+//		FragmentTransaction fragmentAction = getFragmentManager().beginTransaction();
+//		fragmentAction.add(R.id.main_fragment_frame, listRoomFragment);
+//		fragmentAction.addToBackStack(null);
+//		fragmentAction.commit();
+		
 
 		// get a handle to a database and open it.
 		database = new DBOperator(this);
@@ -38,6 +47,17 @@ public class MainActivity extends FragmentActivity implements
 		list_of_rooms = database.getAllDBRoomEntries();
 		adapter_room_list = new ArrayAdapter<DBRoomEntry>(this,
 				android.R.layout.simple_list_item_1, list_of_rooms);
+
+		// We create a GsmService intent and start it here:
+		final GSMResultReceiver resultReceiver = new GSMResultReceiver(null);
+		final Intent i = new Intent(this, CellTowerHandler.class);
+		i.putExtra("receiver", resultReceiver);
+		startService(i);
+		WifiSensor.createInstance(this);
+	}
+
+	@Override
+	protected void onStart() {
 
 		ListView listView = (ListView) findViewById(R.id.listRooms);
 		listView.setAdapter(adapter_room_list);
@@ -51,20 +71,31 @@ public class MainActivity extends FragmentActivity implements
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				
 				DBRoomEntry room = (DBRoomEntry) parent.getItemAtPosition(position);
-				deleteRoomDialog(view, room);
+				detailedRoomDialog(view, room, position);
+//				FragmentTransaction fragmentAction = getFragmentManager().beginTransaction();
+//				fragmentAction.add(R.id.main_fragment_frame, detailedFragment);
+//				fragmentAction.commit();
+//			
+//				DBRoomEntry room = (DBRoomEntry) parent.getItemAtPosition(position);
+//				detailedFragment.setRoom(room);
+
+//				TextView roomName = (TextView) listRoomFragment.getView().findViewById(R.id.detailed_room_name);
+//				roomName.setText(room.getName());
+				
+//				Log.d("pkdata","detailedFragment: " + ((detailedFragment == null) ? "null" : "not null"));
+//				
+//				Log.d("pkdata", "room: " + ((room != null) ? "not null" : "null" ) + "ting");
+//				try {
+//					detailedFragment.setRoom(room);
+//				}
+//				catch (Exception e) {
+//					Log.d("pkdata", "setRoom: " + e.getMessage());
+//				}
+				
+			//	deleteRoomDialog(view, room);
 			}
 		});
-
-		// We create a GsmService intent and start it here:
-		final GSMResultReceiver resultReceiver = new GSMResultReceiver(null);
-		final Intent i = new Intent(this, CellTowerHandler.class);
-		i.putExtra("receiver", resultReceiver);
-		startService(i);
-	}
-
-	@Override
-	protected void onStart() {
-		// TODO Auto-generated method stub
+		
 		super.onStart();
 	}
 
@@ -103,12 +134,30 @@ public class MainActivity extends FragmentActivity implements
 		addRoomDialog.show(manager, "add_room_dialog_id");
 	}
 
-	public void deleteRoomDialog(View view, DBRoomEntry room) {
+	/**
+	 * Create and show a deleteRoomDialog
+	 * 
+	 * @param view The view that was clicked
+	 * @param room The room we want to delete
+	 * @param listID Position in the roomlist - to delete proper list-item
+	 */
+	public void deleteRoomDialog(View view, DBRoomEntry room, int listID) {
 		FragmentManager manager = getFragmentManager();
-		DeleteRoomDialog deleteRoomDialog = new DeleteRoomDialog();
-		deleteRoomDialog.initiate(room);
+		DeleteRoomDialog deleteRoomDialog = DeleteRoomDialog.newInstance(room, listID);
 		deleteRoomDialog.show(manager, "delete_room_dialog_id");
-
+	}
+	
+	/**
+	 * Create and show a detailedRoomDialog
+	 * 
+	 * @param view The view that was clicked
+	 * @param room The room that we want to see details of
+	 * @param listID Position in the list - needed to delete from list if room is deleted.
+	 */
+	public void detailedRoomDialog(View view, DBRoomEntry room, int listID ) {
+		FragmentManager manager = getFragmentManager();
+		DetailsRoomDialog detailsRoomDialog = DetailsRoomDialog.newInstance(room, listID);
+		detailsRoomDialog.show(manager, "detailed_room_dialog_id");
 	}
 
 	/**
@@ -164,17 +213,17 @@ public class MainActivity extends FragmentActivity implements
 	 *            True upon deletion, otherwise false.
 	 */
 	@Override
-	public void onDeleteCommandReceived(Boolean command, DBRoomEntry room) {
+	public void onDeleteCommandReceived(Boolean command, DBRoomEntry room, int listID) {
 		if (command == true) {
 
 			database.deleteRoom(room);
-			adapter_room_list.remove(room);
+			DBRoomEntry listRoom = adapter_room_list.getItem(listID);
+			adapter_room_list.remove(listRoom);
+			
 			Toast.makeText(this,
-					"The room: '" + room.getName() + "' is deleted.",
-					Toast.LENGTH_LONG).show();
-
-			// delete(); // To delete room. Remember: the identity of the room
-			// must be found somewhere...
+						"The room: '" + room.getName() + "' is deleted.",
+						Toast.LENGTH_LONG)
+					.show();
 		}
 	}
 
