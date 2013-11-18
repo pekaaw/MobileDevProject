@@ -23,6 +23,9 @@ public class ServiceHandler extends Service {
 			return Service.START_NOT_STICKY;
 		}
 		
+		WifiSensor.createInstance(this);
+		DBOperator.createInstance(this);
+		
 		// Initialize classes the service is responsible for
 		m_CellTowerHander = new CellTowerHandler();
 		final TelephonyManager manager = (TelephonyManager) getSystemService(Service.TELEPHONY_SERVICE);
