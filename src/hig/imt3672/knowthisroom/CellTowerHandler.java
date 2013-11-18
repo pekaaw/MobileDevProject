@@ -3,16 +3,13 @@ package hig.imt3672.knowthisroom;
 import java.util.Observable;
 import java.util.Observer;
 
-import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 import android.telephony.SignalStrength;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
 /**
@@ -21,55 +18,49 @@ import android.util.Log;
  * TODO: recording cell location changes is TOO frequent, and we may not want to
  * do that
  */
-public class CellTowerHandler extends Service implements Observer {
+public class CellTowerHandler implements Observer {
 
 	final CellTowerData mCellTowerData = new CellTowerData();
 
 	Intent mIntent;
-	ResultReceiver resultReceiver;
+	ResultReceiver m_ResultReceiver;
 
 	// singleton
 	final TelephonyListener mTelListener = new TelephonyListener();
 
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		if ( intent == null ) {
-			Log.d("###", "Service started with a null-intent");
-			return START_NOT_STICKY;
-			// START_NOT_STICKY means that when the calling activity
-			// shuts down, the service will shut down as well.
-			// When we want our service to continue, we want
-			// START_STICKY so that the service sticks around in the
-			// system, but the intent will then be called with a
-			// intent like a nullptr. this will of course give a
-			// nullpointerexception so we need to handle it with 
-			// this if =D
-		}
-		setup(intent);
-		// TODO remove the logging outputs for production
-		Log.d("########", "CellTowerHandler Service Started");
-		return Service.START_NOT_STICKY;
-		// Should be Service.START_STICKY; when we want the service to
-		// hang around.
-	}
+//	@Override
+//	public int onStartCommand(Intent intent, int flags, int startId) {
+//		if ( intent == null ) {
+//			Log.d("###", "Service started with a null-intent");
+//			return START_NOT_STICKY;
+//			// START_NOT_STICKY means that when the calling activity
+//			// shuts down, the service will shut down as well.
+//			// When we want our service to continue, we want
+//			// START_STICKY so that the service sticks around in the
+//			// system, but the intent will then be called with a
+//			// intent like a nullptr. this will of course give a
+//			// nullpointerexception so we need to handle it with 
+//			// this if =D
+//		}
+//		setup(intent);
+//		// TODO remove the logging outputs for production
+//		Log.d("########", "CellTowerHandler Service Started");
+//		return Service.START_NOT_STICKY;
+//		// Should be Service.START_STICKY; when we want the service to
+//		// hang around.
+//	}
 
-	private void setup(Intent intent) {
-		final TelephonyManager manager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-		manager.listen(mTelListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS
-				| PhoneStateListener.LISTEN_SERVICE_STATE
-				| PhoneStateListener.LISTEN_CELL_LOCATION);
-
-		this.resultReceiver = intent.getParcelableExtra("receiver");
-		mCellTowerData.addObserver(this);
-
-		mIntent = intent;
-	}
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	public void setup(Intent intent) {
+//		final TelephonyManager manager = (TelephonyManager) getSystemService(Service.TELEPHONY_SERVICE);
+//		manager.listen(mTelListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS
+//				| PhoneStateListener.LISTEN_SERVICE_STATE
+//				| PhoneStateListener.LISTEN_CELL_LOCATION);
+//
+//		this.m_ResultReceiver = intent.getParcelableExtra("receiver");
+//		mCellTowerData.addObserver(this);
+//
+//		mIntent = intent;
+//	}
 
 	/**
 	 * Responsible for managing the updates from the TelephonyManager.
@@ -119,7 +110,7 @@ public class CellTowerHandler extends Service implements Observer {
 		}
 
 		final Bundle bundle = mCellTowerData.getCellTowerBundle();
-		this.resultReceiver.send(100, bundle);
+		this.m_ResultReceiver.send(100, bundle);
 
 	}
 

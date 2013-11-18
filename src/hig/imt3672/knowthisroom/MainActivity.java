@@ -50,7 +50,8 @@ public class MainActivity extends FragmentActivity implements
 
 		// We create a GsmService intent and start it here:
 		final GSMResultReceiver resultReceiver = new GSMResultReceiver(null);
-		final Intent i = new Intent(this, CellTowerHandler.class);
+		final Intent i = new Intent(this, ServiceHandler.class);
+//		final Intent i = new Intent(this, CellTowerHandler.class);
 		i.putExtra("receiver", resultReceiver);
 		startService(i);
 		WifiSensor.createInstance(this);

@@ -27,8 +27,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
-        <service android:name="hig.imt3672.knowthisroom.WifiSensor" />
-        <service android:name="hig.imt3672.knowthisroom.CellTowerHandler" />
+        <service android:name="hig.imt3672.knowthisroom.ServiceHandler" />
         <activity
             android:name="hig.imt3672.knowthisroom.MainActivity"
             android:label="@string/app_name" >
