@@ -5,6 +5,15 @@ public class DBWifiInRoomEntry {
 	private long roomID;
 	private long connectionStrength;
 
+	DBWifiInRoomEntry() {
+	}
+
+	DBWifiInRoomEntry(String pbsID, long proomID, long pconnectionStrength) {
+		bsID = pbsID;
+		roomID = proomID;
+		connectionStrength = pconnectionStrength;
+	}
+
 	public String getId() {
 		return bsID;
 	}

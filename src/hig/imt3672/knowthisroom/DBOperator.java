@@ -120,14 +120,28 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	public void updateRoom(DBRoomEntry room) {
+		// this must only be run when you are certain you are in the right room
+		// this is still missing update for celltowers(18.11.2013)
 		WifiSensor wifi = WifiSensor.getInstance();
 		List<ScanResult> networks = wifi.GetNetworks();
+		List<DBWifiInRoomEntry> networkListToAdd = new ArrayList<DBWifiInRoomEntry>();
+		List<DBWifiInRoomEntry> networkList = new ArrayList<DBWifiInRoomEntry>();
+		List<DBWifiInRoomEntry> DBnetworkList = new ArrayList<DBWifiInRoomEntry>();
 
-		for (int i = 0; i <= networks.size(); i++) {
-			updateWifi(networks.get(i).BSSID, room.getId(),
-					networks.get(i).level);
+		// prepare list to add new ones and update min and max str for existing
+		for (ScanResult item : networks) {
+			networkList.add(new DBWifiInRoomEntry(item.BSSID, room.getId(),
+					item.level));
+			updateWifi(item.BSSID, room.getId(), item.level);
 		}
+		// prepare list of new networks
+		networkListToAdd = getDifferenceWifi(networkList, DBnetworkList);
 
+		// add new networks
+		for (DBWifiInRoomEntry item : networkListToAdd) {
+			insertWifi(item.getId(), room.getId(), item.getStr());
+
+		}
 	}
 
 	public boolean updateWifi(String BSID, long roomId, int signalStrenght) {
@@ -380,6 +394,52 @@ public class DBOperator { // Handles normal usage of the database
 		wifi.setStr(cursor.getLong(1));
 		wifi.setRoom(cursor.getLong(2));
 		return wifi;
+	}
+
+	private List<DBCelltowerEntry> getDifferenceCell(
+			List<DBCelltowerEntry> list1, List<DBCelltowerEntry> list2) {
+		// must not be used without on entire set, only lists specific to ONE
+		// room
+		// list1 must be the one with the celltowers that should be added
+		List<DBCelltowerEntry> returnList = new ArrayList<DBCelltowerEntry>();
+		boolean exists;
+		for (DBCelltowerEntry item1 : list1) {
+			exists = false;
+			for (DBCelltowerEntry item2 : list2) {
+				if (item1.getId() == item2.getId()) {
+					exists = true;
+				}
+			}
+			if (exists == false) {
+				returnList.add(item1);
+
+			}
+
+		}
+
+		return returnList;
+	}
+
+	private List<DBWifiInRoomEntry> getDifferenceWifi(
+			List<DBWifiInRoomEntry> list1, List<DBWifiInRoomEntry> list2) {
+		// must not be used without on entire set, only lists specific to ONE
+		// room
+		// list1 must be the one with the wifi's that should be added
+		List<DBWifiInRoomEntry> returnList = new ArrayList<DBWifiInRoomEntry>();
+		boolean exists;
+		for (DBWifiInRoomEntry item1 : list1) {
+			exists = false;
+			for (DBWifiInRoomEntry item2 : list2) {
+				if (item1.getId() == item2.getId()) {
+					exists = true;
+				}
+			}
+			if (exists == false) {
+				returnList.add(item1);
+			}
+		}
+
+		return returnList;
 	}
 
 	// :::::::::::LIST TYPE SPESIFIC END:::::::::::::::
