@@ -10,8 +10,11 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.wifi.ScanResult;
 import android.os.Bundle;
+import android.util.Log;
 
 public class DBOperator { // Handles normal usage of the database
+	// singleton
+	static DBOperator mInstance;
 
 	// Database fields
 	private SQLiteDatabase database;
@@ -29,6 +32,23 @@ public class DBOperator { // Handles normal usage of the database
 
 	public void close() {
 		dbHelper.close();
+	}
+
+	// ::::::::::::Singleton:::::::::::::::::::::::
+	public static DBOperator getInstance() {
+		if (mInstance == null) {
+			Log.d("DBOperator", "You have not created an instance.");
+			return null;
+		}
+		return mInstance;
+	}
+
+	public static void createInstance(Context context) {
+		if (mInstance != null) {
+			Log.d("DBOperator", "An instance already exists.");
+			return;
+		}
+		mInstance = new DBOperator(context);
 	}
 
 	// :::::::::::::LIST TYPE SPESIFIC BEGIN::::::::::::::::::::::
