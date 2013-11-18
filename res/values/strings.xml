@@ -10,5 +10,22 @@
     <string name="detailed_room_headline">"Details of "</string>
     <string name="detailed_tower_header">CellTower info:</string>
     <string name="detailed_wifi_header">Wifi info:</string>
+    <string name="eating_potato">Etar potatis</string>
+    <string name="thinking_up_stupid_names">"Thinking up stupid names"</string>
+    <string name="cleaning_tea_cup">"Cleaning tea-cup"</string>
+    <string name="Implementing_NSA">"Implementing NSA backdoor!"</string>
+    <string name="scraping_of_dog">"Removing your fleas."</string>
+    <string name="teaching_jonas">"Teaching Jonas to saxophone."</string>
+    <string name="broadcasting_pos">"Broadcasting your position on Gooogle</string>
+    
+    <string-array name="gplus_logon">
+        <item>@string/eating_potato</item>
+        <item>@string/thinking_up_stupid_names</item>
+        <item>@string/cleaning_tea_cup</item>
+        <item>@string/Implementing_NSA</item>
+        <item>@string/scraping_of_dog</item>
+        <item>@string/teaching_jonas</item>
+        <item>@string/broadcasting_pos</item>
+    </string-array>
     
 </resources>
