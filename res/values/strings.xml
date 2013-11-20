@@ -3,6 +3,8 @@
 
     <string name="app_name">Know This Room</string>
     <string name="action_settings">Settings</string>
+    <string name="gplus_connect">Connect to G+</string>
+    <string name="gplus_disconnect">Disconnect from G+</string>
     <string name="add_room">Add room</string>
     <string name="delete_room">Delete room</string>
     <string name="add_room_instruction">Room name:</string>

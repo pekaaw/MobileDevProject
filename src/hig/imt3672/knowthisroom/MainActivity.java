@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -124,6 +125,10 @@ public class MainActivity extends FragmentActivity implements
 		switch (item.getItemId()) {
 		case R.id.add_room_menu_btn:
 			addRoomNameDialog(item.getActionView());
+			return true;
+			
+		case R.id.plus_connection:
+			Log.d("#MainActivity#", "try to connect");
 			return true;
 
 		default:
