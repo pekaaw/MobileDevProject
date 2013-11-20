@@ -24,6 +24,7 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 	
 	// Classes that the service is responsible for:
 	CellTowerHandler m_CellTowerHander = null;
+	GplusHandler m_GplusHandler = null;
 	
 	// Empty constructor
 	public ServiceHandler() {}
@@ -35,13 +36,16 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 		m_PlusClient = new PlusClient.Builder(this, this, this)
 			.setActions("http://schemas.google.com/CheckInActivity")
 			.build();
+		
+		m_GplusHandler = new GplusHandler();
 
 		super.onCreate();
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		
+		m_PlusClient.connect();
+
 		if( intent == null ) {
 			Log.d("###", "Service started with a null-intent.");
 			return Service.START_NOT_STICKY;
@@ -73,18 +77,22 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 
 	@Override
 	public void onDestroy() {
+		m_PlusClient.disconnect();
 		Log.d("###", "Service stopped.");
 		super.onDestroy();
 	}
 	
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
+		Log.d("#Service#", "Connection failed.");
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onConnected(Bundle connectionHint) {
+		m_GplusHandler.postRoom("Jakob", m_PlusClient);
+
 		// TODO Auto-generated method stub
 		
 	}
