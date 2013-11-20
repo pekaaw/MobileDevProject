@@ -1,23 +1,47 @@
 package hig.imt3672.knowthisroom;
 
+import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-public class ServiceHandler extends Service {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
+import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.plus.PlusClient;
 
+public class ServiceHandler extends Service implements ConnectionCallbacks, OnConnectionFailedListener {
+
+	// PlusClient variables
+	private ProgressDialog m_ConnectionProgressDialog;
+	private PlusClient m_PlusClient;
+	private ConnectionResult m_ConnectionResult;
+
+	
 	// Classes that the service is responsible for:
 	CellTowerHandler m_CellTowerHander = null;
 	
-	public ServiceHandler() {
-		// TODO Auto-generated constructor stub
+	// Empty constructor
+	public ServiceHandler() {}
+	
+	@Override
+	public void onCreate() {
+		
+		// Initialize the google PlusClient
+		m_PlusClient = new PlusClient.Builder(this, this, this)
+			.setActions("http://schemas.google.com/CheckInActivity")
+			.build();
+
+		super.onCreate();
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		
 		if( intent == null ) {
 			Log.d("###", "Service started with a null-intent.");
 			return Service.START_NOT_STICKY;
@@ -44,8 +68,31 @@ public class ServiceHandler extends Service {
 	
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void onDestroy() {
+		Log.d("###", "Service stopped.");
+		super.onDestroy();
+	}
+	
+	@Override
+	public void onConnectionFailed(ConnectionResult result) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onConnected(Bundle connectionHint) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDisconnected() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -56,8 +56,8 @@ public class MainActivity extends FragmentActivity implements
 		i.putExtra("receiver", resultReceiver);
 		startService(i);
 		WifiSensor.createInstance(this);
-		// GplusHandler mPlus = new GplusHandler();
-		// mPlus.init();
+		//GplusHandler mPlus = new GplusHandler();
+		//mPlus.init();
 		// mPlus.postRoom("Jakob");
 	}
 
@@ -221,6 +221,7 @@ public class MainActivity extends FragmentActivity implements
 		// TODO: Add name to new instance, then add celltower and wifi networks.
 
 		// Toast to debug purposes. To be deleted..
+		
 	}
 
 	/**
@@ -270,4 +271,5 @@ public class MainActivity extends FragmentActivity implements
 			}
 		}
 	}
+	
 }
