@@ -1,61 +1,108 @@
-/*
+
 package hig.imt3672.knowthisroom;
 
 import java.util.List;
 
+import android.net.wifi.ScanResult;
+
 public class RoomCheckin {
+	WifiSensor WifiManager;
+	List<ScanResult> Wifis;
+	
 	double level_margin;
 	double room_margin;
-	int size;
 	int[] difference;
-	int valid;
+	DBOperator Db;
+	
+	List<DBCelltowerEntry> Celltowers;
+	List<DBWifiInRoomEntry> DBWifis;
+	
+	long roomTowerId;
+	long roomTowerStrength;
 	
 	RoomCheckin() {
+		WifiManager = WifiSensor.getInstance();
+		Db = DBOperator.getInstance();
+		
 		level_margin = 2.0;
-		room_margin = 0.8;
-		size = Db.size();
-		difference = new int[size];
-		for(int i = 0; i < size; i++) {
-			//We set the default value to an arbitrary value that it can never be naturally.
-			difference[i] = 1024;
-			valid = 0;
-		}
+		room_margin = 0.2;
 	}
 	
-	public void Checkin(long towerId, long towerStrength) {
+	public List<DBRoomEntry> GetRooms(long towerId, long towerStrength) {
+		List<DBRoomEntry> Rooms = Db.getAllDBRoomEntries();
+		int i = 0;
 		
-		//Rooms
-		for(int i = 0; i < Db.size()) {
-			//Skip rooms that don't match the towerId
-			if(Db.room[i].towerId != towerId) {continue;}
+		if(Rooms.size() < 1) {
+			return null;
+		}
+		
+		while(i < Rooms.size()){
+			long roomId = Rooms.get(i).getId();
+			Celltowers = Db.getCellTowers(roomId);
 			
-			//Skip rooms with different celltower strength.
-			if(Db.room[i].towerStrength != towerStrength) {continue;}
+			for(int j=0; j < Celltowers.size(); j++) {
+				roomTowerId = Celltowers.get(j).getId();
+				roomTowerStrength = Celltowers.get(j).getStr();
+				if(towerId == roomTowerId && towerStrength == roomTowerStrength) {
+					break;
+				}
+			}
 			
-			//Browse room networks
-			for(int j = 0; j < Db.room[i].networks.size(); j++) {
+			if(towerId == roomTowerId && towerStrength == roomTowerStrength) {
+				i++;
+			}
+			else {
+				Rooms.remove(i);
+			}
+		}
+		return Rooms;
+	}
+	
+	public DBRoomEntry GetRoom(List<DBRoomEntry> RoomEntries) {
+		int valid = 0;
+		Wifis = WifiManager.GetNetworks();
+		
+		if(RoomEntries.size() < 1) {
+			return null;
+		}
+		
+		do {
+			int i = 0;
+			while(i != RoomEntries.size()) {
+				long roomId = RoomEntries.get(i).getId();
+				DBWifis = Db.getWifi(roomId);
 				
-				//Find if the room network is in results
-				for(int k = 0; k < networks.size(); k++) {
-					//Skip to next result if the BSSID isn't the correct one
-					if(Db.room[i].networks.get(j).BSSID != networks.get(k).BSSID) {continue;} 
-					
-					difference[j] = Db.room[i].networks.get(j).level - networks.get(k).level;
+				difference = new int[DBWifis.size()];
+				for(int j = 0; j < DBWifis.size(); j++) {
+					//We set the default value to an arbitrary value that it can never be naturally.
+					difference[j] = 1024;
 				}
 				
+				for(int j = 0; j < DBWifis.size(); j++) {
+					for(int k = 0; k < Wifis.size(); k++) {
+						if(DBWifis.get(j).getId() == Wifis.get(k).BSSID) {
+							difference[j] = (int) (DBWifis.get(j).getStr() - Wifis.get(k).frequency);
+						}
+					}
+				}
 				
+				for(int j = 0; j < DBWifis.size(); j++) {
+					if(difference[j] == 1024) {continue;}
+					if(difference[j] < level_margin &&
+					   difference[j] > level_margin*-1) {valid++; continue;}
+				}
+				
+				if(valid/DBWifis.size() > (1-room_margin)) {
+					i++;
+				}
+				else {RoomEntries.remove(i);}
 			}
 			
-			//Check if room networks are within valid range (or exist at all) 
-			for(int j = 0; j < size; j++) {
-				if(difference[j] == 1024) {continue;}
-				if(difference[j] < level_margin &&
-				   difference[j] > level_margin*-1) {valid++; continue;}
+			if(RoomEntries.size() <= 1) {
+				level_margin = level_margin/2;
+				room_margin = room_margin/2;
 			}
-			
-			//Check if the room is compatible with the results. If yes return.
-			if(valid/size > room_margin) {return room;}
-		}
+		} while(RoomEntries.size() <= 1);
+		return RoomEntries.get(0);
 	}
 }
-*/
