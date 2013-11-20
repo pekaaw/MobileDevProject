@@ -81,6 +81,9 @@ public class RoomCheckin {
 					if(difference[j] < level_margin &&
 					   difference[j] > level_margin*-1) {valid++; continue;}
 				}
+				
+				if(valid/DBWifis.size() > (1-room_margin)) {continue;}
+				else {RoomEntries.remove(i);}
 			}
 			
 			if(RoomEntries.size() <= 1) {
@@ -88,44 +91,6 @@ public class RoomCheckin {
 				room_margin = room_margin/2;
 			}
 		} while(RoomEntries.size() <= 1);
-		return null;
+		return RoomEntries.get(0);
 	}
-	
-	/*
-	public void Checkin(long towerId, long towerStrength) {
-		
-		//Rooms
-		for(int i = 0; i < size; i++) {
-			//Skip rooms that don't match the towerId
-			if(Db.room[i].towerId != towerId) {continue;}
-			
-			//Skip rooms with different celltower strength.
-			if(Db.room[i].towerStrength != towerStrength) {continue;}
-			
-			//Browse room networks
-			for(int j = 0; j < Db.room[i].networks.size(); j++) {
-				
-				//Find if the room network is in results
-				for(int k = 0; k < networks.size(); k++) {
-					//Skip to next result if the BSSID isn't the correct one
-					if(Db.room[i].networks.get(j).BSSID != networks.get(k).BSSID) {continue;} 
-					
-					difference[j] = Db.room[i].networks.get(j).level - networks.get(k).level;
-				}
-				
-				
-			}
-			
-			//Check if room networks are within valid range (or exist at all) 
-			for(int j = 0; j < size; j++) {
-				if(difference[j] == 1024) {continue;}
-				if(difference[j] < level_margin &&
-				   difference[j] > level_margin*-1) {valid++; continue;}
-			}
-			
-			//Check if the room is compatible with the results. If yes return.
-			if(valid/size > room_margin) {return room;}
-		}
-	}
-	*/
 }
