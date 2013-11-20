@@ -14,7 +14,6 @@ public class RoomCheckin {
 	int[] difference;
 	DBOperator Db;
 	
-	List<DBRoomEntry> Rooms;
 	List<DBCelltowerEntry> Celltowers;
 	List<DBWifiInRoomEntry> DBWifis;
 	
@@ -30,8 +29,14 @@ public class RoomCheckin {
 	}
 	
 	public List<DBRoomEntry> GetRooms(long towerId, long towerStrength) {
-		Rooms = Db.getAllDBRoomEntries();
-		for(int i = 0; i < Rooms.size(); i++) {
+		List<DBRoomEntry> Rooms = Db.getAllDBRoomEntries();
+		int i = 0;
+		
+		if(Rooms.size() < 1) {
+			return null;
+		}
+		
+		while(i < Rooms.size()){
 			long roomId = Rooms.get(i).getId();
 			Celltowers = Db.getCellTowers(roomId);
 			
@@ -44,7 +49,7 @@ public class RoomCheckin {
 			}
 			
 			if(towerId == roomTowerId && towerStrength == roomTowerStrength) {
-				continue;
+				i++;
 			}
 			else {
 				Rooms.remove(i);
@@ -57,9 +62,14 @@ public class RoomCheckin {
 		int valid = 0;
 		Wifis = WifiManager.GetNetworks();
 		
+		if(RoomEntries.size() < 1) {
+			return null;
+		}
+		
 		do {
-			for(int i = 0; i < RoomEntries.size(); i++) {
-				long roomId = Rooms.get(i).getId();
+			int i = 0;
+			while(i != RoomEntries.size()) {
+				long roomId = RoomEntries.get(i).getId();
 				DBWifis = Db.getWifi(roomId);
 				
 				difference = new int[DBWifis.size()];
@@ -82,7 +92,9 @@ public class RoomCheckin {
 					   difference[j] > level_margin*-1) {valid++; continue;}
 				}
 				
-				if(valid/DBWifis.size() > (1-room_margin)) {continue;}
+				if(valid/DBWifis.size() > (1-room_margin)) {
+					i++;
+				}
 				else {RoomEntries.remove(i);}
 			}
 			
