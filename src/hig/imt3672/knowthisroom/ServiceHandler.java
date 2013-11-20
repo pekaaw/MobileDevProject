@@ -3,6 +3,7 @@ package hig.imt3672.knowthisroom;
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.telephony.PhoneStateListener;
@@ -12,16 +13,28 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.plus.PlusClient;
 
-public class ServiceHandler extends Service implements ConnectionCallbacks, OnConnectionFailedListener {
+public class ServiceHandler extends Service implements ConnectionCallbacks, OnConnectionFailedListener, MainActivity.toService {
 
-	// PlusClient variables
-	private ProgressDialog m_ConnectionProgressDialog;
-	private PlusClient m_PlusClient;
-	private ConnectionResult m_ConnectionResult;
-
+	// static reference to self
+	private static ServiceHandler m_instance;
 	
+	// PlusClient variables
+	ProgressDialog m_ConnectionProgressDialog;
+	PlusClient m_PlusClient;
+	ConnectionResult m_ConnectionResult;
+	
+	
+	public PlusClient getPlusClient() {
+		return m_PlusClient;
+	}
+
+	public void setConnectionResult(ConnectionResult m_ConnectionResult) {
+		this.m_ConnectionResult = m_ConnectionResult;
+	}
+
 	// Classes that the service is responsible for:
 	CellTowerHandler m_CellTowerHander = null;
 	GplusHandler m_GplusHandler = null;
@@ -32,9 +45,13 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 	@Override
 	public void onCreate() {
 		
+		// make static reference here
+		m_instance = this;
+		
 		// Initialize the google PlusClient
 		m_PlusClient = new PlusClient.Builder(this, this, this)
 			.setActions("http://schemas.google.com/CheckInActivity")
+			.setScopes(Scopes.PLUS_LOGIN)
 			.build();
 		
 		m_GplusHandler = new GplusHandler();
@@ -74,6 +91,10 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
+	
+	public static ServiceHandler getInstance() {
+		return m_instance;
+	}
 
 	@Override
 	public void onDestroy() {
@@ -85,8 +106,18 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
 		Log.d("#Service#", "Connection failed.");
-		// TODO Auto-generated method stub
 		
+		// this may resolt in a loop if mainactivity is not found
+        if (result.hasResolution()) {
+        	try {
+        		result.startResolutionForResult(MainActivity.getInstance(), GplusHandler.REQUEST_CODE_RESOLVE_ERR);
+        	} catch (SendIntentException e) {
+        		m_PlusClient.connect();
+    		}
+        }
+
+
+		m_ConnectionResult = result;		
 	}
 
 	@Override
@@ -99,6 +130,19 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 
 	@Override
 	public void onDisconnected() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gplus_connect() {
+		Log.d("Service", "connection! we look for you");
+		m_PlusClient.connect();
+				
+	}
+
+	@Override
+	public void gplus_disconnect() {
 		// TODO Auto-generated method stub
 		
 	}

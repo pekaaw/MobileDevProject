@@ -21,7 +21,8 @@ import android.widget.Toast;
 public class MainActivity extends FragmentActivity implements
 		AddRoomDialog.Communicator, DeleteRoomDialog.Communicator {
 
-	// ListRoomFragment listRoomFragment;
+	static MainActivity m_instance;
+	
 	List<DBRoomEntry> list_of_rooms;
 	ArrayAdapter<DBRoomEntry> adapter_room_list;
 	Bundle gsmCellData;
@@ -32,13 +33,8 @@ public class MainActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		// listRoomFragment = new ListRoomFragment();
-		//
-		// FragmentTransaction fragmentAction =
-		// getFragmentManager().beginTransaction();
-		// fragmentAction.add(R.id.main_fragment_frame, listRoomFragment);
-		// fragmentAction.addToBackStack(null);
-		// fragmentAction.commit();
+		// make static reference here
+		m_instance = this;
 
 		// get a handle to a database and open it.
 		DBOperator.createInstance(getBaseContext());
@@ -129,12 +125,43 @@ public class MainActivity extends FragmentActivity implements
 			
 		case R.id.plus_connection:
 			Log.d("#MainActivity#", "try to connect");
+			try {
+				ServiceHandler.getInstance().gplus_connect();
+			}
+			catch( Exception e ) {
+				// Do nothing. What happend was probably that the service had
+				// yet to be created so getInstance returned null
+				// @nullPointerException
+			}
 			return true;
 
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
+
+	public static MainActivity getInstance() {
+		return m_instance;
+	}
+	
+	@Override
+    protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
+		/**
+		 * If we previously failed to connect to G+ and response now is OK, 
+		 * we set the connectionResult in the service to null and try to connect again.
+		 * [ I don't know what I'm doing here... ]
+		 */
+        if (requestCode == GplusHandler.REQUEST_CODE_RESOLVE_ERR && responseCode == RESULT_OK) {
+        	try {
+        		ServiceHandler.getInstance().setConnectionResult(null);
+        		ServiceHandler.getInstance().getPlusClient().connect();
+        	}
+        	catch ( Exception e ) {
+        		// in case something fails, don't make phone explode (hopefully)
+        	}
+        }
+    }
+
 
 	/**
 	 * addRoomNameDialog - Open a dialog to name a new Room
@@ -275,6 +302,11 @@ public class MainActivity extends FragmentActivity implements
 				gsmCellData = resultData;
 			}
 		}
+	}
+	
+	interface toService {
+		public void gplus_connect();
+		public void gplus_disconnect();
 	}
 	
 }

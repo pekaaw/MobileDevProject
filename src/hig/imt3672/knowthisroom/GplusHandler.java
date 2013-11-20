@@ -7,6 +7,9 @@ import com.google.android.gms.plus.model.moments.ItemScope;
 import com.google.android.gms.plus.model.moments.Moment;
 
 public class GplusHandler {
+	
+    public static final int REQUEST_CODE_RESOLVE_ERR = 9000;
+
 	/*
 	 * @Override protected void onCreate(Bundle savedInstanceState) {
 	 * super.onCreate(savedInstanceState);
@@ -54,8 +57,9 @@ public class GplusHandler {
 		// mPlusClient.writeMoment(moment);
 
 		// Builds the item for the moment
-		ItemScope itemScope = new ItemScope.Builder().setId(roomName)
-				.setType("http://schemas.google.com/CheckInActivity")
+		ItemScope itemScope = new ItemScope.Builder()
+				.setId(roomName)
+				.setType("http://schema.org/Place")
 				.setName(roomName)
 				.setDescription("I just went into room: " + roomName)
 				.setText("I just went into room: " + roomName).build();
@@ -63,7 +67,8 @@ public class GplusHandler {
 		// Builds a moment
 		Moment moment = new Moment.Builder()
 				.setType("http://schemas.google.com/CheckInActivity")
-				.setTarget(itemScope).build();
+				.setTarget(itemScope)
+				.build();
 		Log.d("Moment", moment.toString());
 		plusClient.writeMoment(moment);
 	}
