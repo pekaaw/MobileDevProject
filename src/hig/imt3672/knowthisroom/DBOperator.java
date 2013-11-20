@@ -52,7 +52,9 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	// :::::::::::::LIST TYPE SPESIFIC BEGIN::::::::::::::::::::::
-	private boolean insertWifi(String wifiBSID, long roomId, long strength) {
+
+	private boolean insertWifi(String wifiBSID, long roomId, long strengthMin,
+			long strengthMax) {
 		ContentValues wifiValues = new ContentValues();
 		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID, roomId);
 		// <-is as it should be
@@ -61,10 +63,10 @@ public class DBOperator { // Handles normal usage of the database
 				.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_WIFI_ID, wifiBSID);
 		// <-NEEDS ID FROM ACTUAL WIFI (BSID)
 
-		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MAX, strength);
+		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MAX, strengthMax);
 		// <-set a default value?
 
-		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN, strength);
+		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN, strengthMin);
 		// <-set a default value?
 
 		/* long wifiInsertId = */
@@ -101,17 +103,6 @@ public class DBOperator { // Handles normal usage of the database
 				allRooms, ExtendedSQLLiteHelper.ROOM_COLUMN_ID + " = "
 						+ insertId, null, null, null, null);
 
-		// for each wifi {
-		WifiSensor wifi = WifiSensor.getInstance();
-		List<ScanResult> networks = wifi.GetNetworks();
-
-		if (wifi.GetSize() != 0) {
-			for (int i = 0; i < networks.size(); i++) {
-				insertWifi(networks.get(i).BSSID, insertId,
-						networks.get(i).level);
-			}
-		}
-
 		// for each celltower {
 		long cellTowerId = cellTowerBundle.getInt("CellID");
 		long towerStrength = cellTowerBundle.getInt("Strength");
@@ -121,11 +112,13 @@ public class DBOperator { // Handles normal usage of the database
 		cursor.moveToFirst();
 		DBRoomEntry newRoom = cursorToDBRoomEntry(cursor);
 		cursor.close();
+		updateRoom(newRoom);
 		return newRoom;
 	}
 
 	public void deleteRoom(DBRoomEntry room) {
 		long id = room.getId();
+		updateRoom(room);
 		System.out.println("Room deleted with id: " + id);
 		database.delete(ExtendedSQLLiteHelper.ROOM_TABLE,
 				ExtendedSQLLiteHelper.ROOM_COLUMN_ID + " = " + id, null);
@@ -148,64 +141,70 @@ public class DBOperator { // Handles normal usage of the database
 		List<DBWifiInRoomEntry> networkList = new ArrayList<DBWifiInRoomEntry>();
 		List<DBWifiInRoomEntry> DBnetworkList = new ArrayList<DBWifiInRoomEntry>();
 
-		// prepare list to add new ones and update min and max str for existing
 		for (ScanResult item : networks) {
 			networkList.add(new DBWifiInRoomEntry(item.BSSID, room.getId(),
 					item.level));
-			updateWifi(item.BSSID, room.getId(), item.level);
 		}
+		DBnetworkList = this.getWifi(room.getId());
+
 		// prepare list of new networks
 		networkListToAdd = getDifferenceWifi(networkList, DBnetworkList);
 
 		// add new networks
 		for (DBWifiInRoomEntry item : networkListToAdd) {
-			insertWifi(item.getId(), room.getId(), item.getStr());
+			insertWifi(item.getId(), room.getId(), item.getMin(), item.getMax());
 
 		}
+		// prepare list to add new ones and update min and max str for existing
+		for (ScanResult item : networks) {
+			updateWifi(item.BSSID, room.getId(), item.level);
+		}
+		DBnetworkList = this.getWifi(room.getId());
 	}
 
 	public boolean updateWifi(String BSID, long roomId, int signalStrenght) {
 
 		// CHECK IF THE WIFI EXISTS BEFORE YOU RUN THIS FUNCTION
 
-		ContentValues cellValues = new ContentValues();
+		ContentValues wifiValues = new ContentValues();
 		// Database sql get-statements
-		String WIFI_GET_MAX = ("SELECT "
+		String WHERE_STATEMENT = ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_WIFI_ID
+				+ " = '" + BSID + "' AND "
+				+ ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID + " = "
+				+ roomId;
+
+		String WIFI_GET_MAX = "SELECT "
 				+ ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MAX + " FROM "
 				+ ExtendedSQLLiteHelper.WIFI_ROOM_TABLE + " WHERE "
-				+ ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_WIFI_ID + " = "
-				+ " ? AND " + ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID + " = ?");
+				+ WHERE_STATEMENT;
 
 		String WIFI_GET_MIN = "SELECT "
 				+ ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN + " FROM "
 				+ ExtendedSQLLiteHelper.WIFI_ROOM_TABLE + " WHERE "
-				+ ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_WIFI_ID + " = ?"
-				+ " AND " + ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID
-				+ " = ?";
+				+ WHERE_STATEMENT;
 
-		String GET_CELLTOWER = ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_WIFI_ID
-				+ " = ? AND " + ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID
-				+ " = ?";
-
-		Cursor cursor = database.rawQuery(WIFI_GET_MAX, new String[] { BSID,
-				String(roomId) });
-		long DBmax = cursorToWifiStr(cursor);
-		cursor = database.rawQuery(WIFI_GET_MIN, new String[] { BSID,
-				String(roomId) });
-		long DBmin = cursorToWifiStr(cursor);
+		Cursor cursor = database.rawQuery(WIFI_GET_MAX, null);// new String[] {
+																// BSID,
+		// String(roomId) });
+		cursor.moveToFirst();
+		long DBmax = cursorToLong(cursor);
+		cursor = database.rawQuery(WIFI_GET_MIN, null);// new String[] { BSID,
+		// String(roomId) });
+		cursor.moveToFirst();
+		long DBmin = cursorToLong(cursor);
 
 		if (signalStrenght > DBmax) {
-			cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MAX,
+			wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MAX,
 					signalStrenght);
 		} else if (signalStrenght < DBmin) {
 
-			cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MIN,
+			wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN,
 					signalStrenght);
 		} else {
 			return false;
 		}
-		database.update(ExtendedSQLLiteHelper.CELLTOWER_TABLE, cellValues,
-				GET_CELLTOWER, new String[] { BSID, String(roomId) });
+		database.update(ExtendedSQLLiteHelper.WIFI_ROOM_TABLE, wifiValues,
+				WHERE_STATEMENT, null);
 		return true;
 	}
 
@@ -216,29 +215,27 @@ public class DBOperator { // Handles normal usage of the database
 		ContentValues cellValues = new ContentValues();
 		long roomId = room.getId();
 		// Database sql get-statements
-		String CELLTOWER_GET_MAX = ("SELECT "
+		String GET_CELLTOWER = ExtendedSQLLiteHelper.CELLTOWER_COLUMN_TOWER_ID
+				+ " = '" + cellId + "'AND "
+				+ ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID + " = "
+				+ roomId;
+
+		String CELLTOWER_GET_MAX = "SELECT "
 				+ ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MAX + " FROM "
 				+ ExtendedSQLLiteHelper.CELLTOWER_TABLE + " WHERE "
-				+ ExtendedSQLLiteHelper.CELLTOWER_COLUMN_TOWER_ID + " = "
-				+ " ? AND " + ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID + " = ?");
+				+ GET_CELLTOWER;
 
 		String CELLTOWER_GET_MIN = "SELECT "
 				+ ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MIN + " FROM "
 				+ ExtendedSQLLiteHelper.CELLTOWER_TABLE + " WHERE "
-				+ ExtendedSQLLiteHelper.CELLTOWER_COLUMN_TOWER_ID + " = ?"
-				+ " AND " + ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
-				+ " = ?";
+				+ GET_CELLTOWER;
 
-		String GET_CELLTOWER = ExtendedSQLLiteHelper.CELLTOWER_COLUMN_TOWER_ID
-				+ " = ? AND " + ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
-				+ " = ?";
-
-		Cursor cursor = database.rawQuery(CELLTOWER_GET_MAX, new String[] {
-				String(cellId), String(roomId) });
-		long DBmax = cursorToCellStr(cursor);
-		cursor = database.rawQuery(CELLTOWER_GET_MIN, new String[] {
-				String(cellId), String(roomId) });
-		long DBmin = cursorToCellStr(cursor);
+		Cursor cursor = database.rawQuery(CELLTOWER_GET_MAX, null);
+		cursor.moveToFirst();
+		long DBmax = cursorToLong(cursor);
+		cursor = database.rawQuery(CELLTOWER_GET_MIN, null);
+		cursor.moveToFirst();
+		long DBmin = cursorToLong(cursor);
 
 		if (signalStrenght > DBmax) {
 			cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MAX,
@@ -251,7 +248,7 @@ public class DBOperator { // Handles normal usage of the database
 			return false;
 		}
 		database.update(ExtendedSQLLiteHelper.CELLTOWER_TABLE, cellValues,
-				GET_CELLTOWER, new String[] { String(cellId), String(roomId) });
+				GET_CELLTOWER, null);
 		return true;
 	}
 
@@ -290,6 +287,14 @@ public class DBOperator { // Handles normal usage of the database
 		return cursor.getLong(2);
 	}
 
+	private long cursorToLong(Cursor cursor) {
+		return cursor.getLong(0);
+	}
+
+	private String cursorToString(Cursor cursor) {
+		return cursor.getString(0);
+	}
+
 	// :::::::cursor for rooms::::::::::
 	private DBRoomEntry cursorToDBRoomEntry(Cursor cursor) {
 		DBRoomEntry room = new DBRoomEntry();
@@ -303,7 +308,7 @@ public class DBOperator { // Handles normal usage of the database
 		List<DBCelltowerEntry> list = new ArrayList<DBCelltowerEntry>();
 
 		String whereStatement = (ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
-				+ "=" + String(roomId) + "AND"
+				+ "=" + roomId + "AND"
 				+ ExtendedSQLLiteHelper.CELLTOWER_COLUMN_TOWER_ID + "=" + ID);
 
 		Cursor cursor = database.query(ExtendedSQLLiteHelper.CELLTOWER_TABLE,
@@ -329,8 +334,8 @@ public class DBOperator { // Handles normal usage of the database
 	public List<DBCelltowerEntry> getCellTowers(long roomId) {
 		List<DBCelltowerEntry> returnList = new ArrayList<DBCelltowerEntry>();
 
-		String whereStatement = (ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
-				+ "=" + String(roomId));
+		String whereStatement = ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
+				+ "=" + roomId;
 
 		Cursor cursor = database.query(ExtendedSQLLiteHelper.CELLTOWER_TABLE,
 				null, whereStatement, null, null, null, null);
@@ -349,10 +354,15 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	private DBCelltowerEntry cursorToDBCelltowerEntry(Cursor cursor) {
+
+		// this order might be
+		// WRONG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		DBCelltowerEntry tower = new DBCelltowerEntry();
 		tower.setId(cursor.getLong(0));
-		tower.setStr(cursor.getLong(1));
-		tower.setRoom(cursor.getLong(2));
+		tower.setRoom(cursor.getLong(1));
+		tower.setMin(cursor.getLong(2));
+		tower.setMax(cursor.getLong(3));
+
 		return tower;
 	}
 
@@ -360,10 +370,10 @@ public class DBOperator { // Handles normal usage of the database
 	public List<DBWifiInRoomEntry> getWifi(long roomId) {
 		List<DBWifiInRoomEntry> returnList = new ArrayList<DBWifiInRoomEntry>();
 
-		String whereStatement = (ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
-				+ "=" + String(roomId));
+		String whereStatement = (ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID
+				+ "=" + roomId);
 
-		Cursor cursor = database.query(ExtendedSQLLiteHelper.CELLTOWER_TABLE,
+		Cursor cursor = database.query(ExtendedSQLLiteHelper.WIFI_ROOM_TABLE,
 				null, whereStatement, null, null, null, null);
 
 		cursor.moveToFirst();
@@ -411,8 +421,10 @@ public class DBOperator { // Handles normal usage of the database
 	private DBWifiInRoomEntry cursorToDBWifiInRoomEntry(Cursor cursor) {
 		DBWifiInRoomEntry wifi = new DBWifiInRoomEntry();
 		wifi.setId(cursor.getString(0));
-		wifi.setStr(cursor.getLong(1));
-		wifi.setRoom(cursor.getLong(2));
+		wifi.setRoom(cursor.getLong(1));
+		wifi.setMin(cursor.getLong(2));
+		wifi.setMax(cursor.getLong(3));
+
 		return wifi;
 	}
 
@@ -442,21 +454,34 @@ public class DBOperator { // Handles normal usage of the database
 
 	private List<DBWifiInRoomEntry> getDifferenceWifi(
 			List<DBWifiInRoomEntry> list1, List<DBWifiInRoomEntry> list2) {
-		// must not be used without on entire set, only lists specific to ONE
-		// room
-		// list1 must be the one with the wifi's that should be added
+
 		List<DBWifiInRoomEntry> returnList = new ArrayList<DBWifiInRoomEntry>();
 		boolean exists;
-		for (DBWifiInRoomEntry item1 : list1) {
-			exists = false;
-			for (DBWifiInRoomEntry item2 : list2) {
-				if (item1.getId() == item2.getId()) {
-					exists = true;
+		if (list1.size() > list2.size()) {
+			for (DBWifiInRoomEntry item1 : list1) {
+				exists = false;
+				for (DBWifiInRoomEntry item2 : list2) {
+					if (item1.getId().equals(item2.getId())) {
+						exists = true;
+					}
+				}
+				if (exists == false) {
+					returnList.add(item1);
 				}
 			}
-			if (exists == false) {
-				returnList.add(item1);
+		} else {
+			for (DBWifiInRoomEntry item2 : list2) {
+				exists = false;
+				for (DBWifiInRoomEntry item1 : list1) {
+					if (item2.getId() == item1.getId()) {
+						exists = true;
+					}
+				}
+				if (exists == false) {
+					returnList.add(item2);
+				}
 			}
+
 		}
 
 		return returnList;

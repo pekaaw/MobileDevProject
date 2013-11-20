@@ -2,8 +2,9 @@ package hig.imt3672.knowthisroom;
 
 public class DBCelltowerEntry {
 	private long towerID;
-	private long strength;
 	private long roomID;
+	private long min;
+	private long max;
 
 	public long getId() {
 		return towerID;
@@ -13,12 +14,20 @@ public class DBCelltowerEntry {
 		this.roomID = id;
 	}
 
-	public long getStr() {
-		return strength;
+	public long getMax() {
+		return max;
 	}
 
-	public void setStr(long str) {
-		this.strength = str;
+	public long getMin() {
+		return min;
+	}
+
+	public void setMin(long str) {
+		this.min = str;
+	}
+
+	public void setMax(long str) {
+		this.max = str;
 	}
 
 	public long getRoom() {

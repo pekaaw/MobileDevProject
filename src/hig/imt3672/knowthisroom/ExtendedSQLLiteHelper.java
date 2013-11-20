@@ -44,7 +44,7 @@ public class ExtendedSQLLiteHelper extends SQLiteOpenHelper { // Handles
 			+ " integer not null)";
 	private static final String ROOM_DATABASE_CREATE = "create table "
 			+ ROOM_TABLE + " ( " + ROOM_COLUMN_ID
-			+ " integer PRIMARY KEY AUTOINCREMENT, " + ROOM_COLUMN_NAME 
+			+ " Integer PRIMARY KEY AUTOINCREMENT, " + ROOM_COLUMN_NAME
 			+ " text not null)";
 
 	private static final String WIFI_ROOM_DATABASE_CREATE = "create table "
