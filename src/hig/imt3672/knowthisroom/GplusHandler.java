@@ -10,14 +10,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
-import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.plus.PlusClient;
 import com.google.android.gms.plus.model.moments.ItemScope;
 import com.google.android.gms.plus.model.moments.Moment;
 
-public class GplusHandler extends MainActivity implements ConnectionCallbacks,
-		OnConnectionFailedListener {
+public class GplusHandler extends MainActivity implements
+		PlusClient.ConnectionCallbacks, PlusClient.OnConnectionFailedListener {
 	private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
 
 	private ProgressDialog mConnectionProgressDialog;
@@ -31,12 +29,16 @@ public class GplusHandler extends MainActivity implements ConnectionCallbacks,
 	}
 
 	public void init() {
-		PlusClient.Builder builder = new PlusClient.Builder(this, this, this);
-		builder.setActions("http://schemas.google.com/CheckInActivity");
-		builder.setScopes("PLUS_LOGIN");
-		PlusClient test = builder.build();
+		/*
+		 * PlusClient.Builder builder = new PlusClient.Builder(this, this,
+		 * this);
+		 * builder.setActions("http://schemas.google.com/CheckInActivity");
+		 * builder.setScopes("PLUS_LOGIN"); PlusClient test = builder.build();
+		 */
+		mPlusClient = new PlusClient.Builder(this, this, this).setActions(
+				"http://schemas.google.com/CheckInActivity").build();
 
-		mPlusClient = test;
+		// mPlusClient = test;
 		// mPlusClient = new PlusClient.Builder(this, this, this)
 		// .setActions("http://schemas.google.com/CheckInActivity")
 		// .setScopes("PLUS_LOGIN").build();

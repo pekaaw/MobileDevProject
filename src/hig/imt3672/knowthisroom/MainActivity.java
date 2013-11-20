@@ -56,6 +56,9 @@ public class MainActivity extends FragmentActivity implements
 		i.putExtra("receiver", resultReceiver);
 		startService(i);
 		WifiSensor.createInstance(this);
+		// GplusHandler mPlus = new GplusHandler();
+		// mPlus.init();
+		// mPlus.postRoom("Jakob");
 	}
 
 	@Override
