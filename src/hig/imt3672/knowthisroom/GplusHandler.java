@@ -59,14 +59,15 @@ public class GplusHandler {
 		// Builds the item for the moment
 		ItemScope itemScope = new ItemScope.Builder()
 				.setId(roomName)
-				.setType("http://schema.org/Place")
+				.setType("http://schema.org/Thing")
 				.setName(roomName)
 				.setDescription("I just went into room: " + roomName)
-				.setText("I just went into room: " + roomName).build();
+				//.setText("I just went into room: " + roomName)
+				.build();
 
 		// Builds a moment
 		Moment moment = new Moment.Builder()
-				.setType("http://schemas.google.com/CheckInActivity")
+				.setType("http://schemas.google.com/AddActivity")
 				.setTarget(itemScope)
 				.build();
 		Log.d("Moment", moment.toString());
