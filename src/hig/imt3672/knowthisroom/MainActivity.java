@@ -135,6 +135,14 @@ public class MainActivity extends FragmentActivity implements
 			}
 			return true;
 
+		case R.id.plus_disconnection:
+			try {
+				ServiceHandler.getInstance().gplus_disconnect();
+			}
+			catch( Exception e ) {
+				// Do nothing.
+			}
+			
 		default:
 			return super.onOptionsItemSelected(item);
 		}

@@ -50,7 +50,7 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 		
 		// Initialize the google PlusClient
 		m_PlusClient = new PlusClient.Builder(this, this, this)
-			.setActions("http://schemas.google.com/AddActivity")
+			.setActions("http://schemas.google.com/CheckInActivity")
 			.setScopes(Scopes.PLUS_LOGIN)
 			.build();
 		
@@ -122,15 +122,14 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 
 	@Override
 	public void onConnected(Bundle connectionHint) {
+		Log.d("#Service#", "Got connected.");
 		m_GplusHandler.postRoom("Know This Room", m_PlusClient);
 
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onDisconnected() {
-		// TODO Auto-generated method stub
+		Log.d("#Service#", "Got disconnected.");
 		
 	}
 
@@ -143,8 +142,8 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 
 	@Override
 	public void gplus_disconnect() {
-		// TODO Auto-generated method stub
-		
+		Log.d("#Service#", "Try to disconnect.");
+		m_PlusClient.disconnect();
 	}
 
 }
