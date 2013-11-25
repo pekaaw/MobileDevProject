@@ -103,22 +103,15 @@ public class DBOperator { // Handles normal usage of the database
 				allRooms, ExtendedSQLLiteHelper.ROOM_COLUMN_ID + " = "
 						+ insertId, null, null, null, null);
 
-		// for each celltower {
-		long cellTowerId = cellTowerBundle.getInt("CellID");
-		long towerStrength = cellTowerBundle.getInt("Strength");
-		insertCell(cellTowerId, insertId, towerStrength);
-		// }
-
 		cursor.moveToFirst();
 		DBRoomEntry newRoom = cursorToDBRoomEntry(cursor);
 		cursor.close();
-		updateRoom(newRoom);
+		updateRoom(newRoom, cellTowerBundle);
 		return newRoom;
 	}
 
 	public void deleteRoom(DBRoomEntry room) {
 		long id = room.getId();
-		updateRoom(room);
 		System.out.println("Room deleted with id: " + id);
 		database.delete(ExtendedSQLLiteHelper.ROOM_TABLE,
 				ExtendedSQLLiteHelper.ROOM_COLUMN_ID + " = " + id, null);
@@ -132,9 +125,9 @@ public class DBOperator { // Handles normal usage of the database
 				null);
 	}
 
-	public void updateRoom(DBRoomEntry room) {
+	public void updateRoom(DBRoomEntry room, Bundle cellTowerBundle) {
 		// this must only be run when you are certain you are in the right room
-		// this is still missing update for celltowers(18.11.2013)
+
 		WifiSensor wifi = WifiSensor.getInstance();
 		List<ScanResult> networks = wifi.GetNetworks();
 		List<DBWifiInRoomEntry> networkListToAdd = new ArrayList<DBWifiInRoomEntry>();
@@ -160,6 +153,18 @@ public class DBOperator { // Handles normal usage of the database
 			updateWifi(item.BSSID, room.getId(), item.level);
 		}
 		DBnetworkList = this.getWifi(room.getId());
+
+		// for each celltower {
+		long cellTowerId = cellTowerBundle.getInt("CellID");
+		long towerStrength = cellTowerBundle.getInt("Strength");
+		if (!cellExists(room.getId(), cellTowerId)) {
+			insertCell(cellTowerId, room.getId(), towerStrength);
+		} else {
+			updateCell(room, cellTowerId, towerStrength);
+		}
+
+		// }
+
 	}
 
 	public boolean updateWifi(String BSID, long roomId, int signalStrenght) {
