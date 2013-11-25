@@ -313,7 +313,7 @@ public class DBOperator { // Handles normal usage of the database
 		List<DBCelltowerEntry> list = new ArrayList<DBCelltowerEntry>();
 
 		String whereStatement = (ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
-				+ "=" + roomId + "AND"
+				+ "=" + roomId + " AND "
 				+ ExtendedSQLLiteHelper.CELLTOWER_COLUMN_TOWER_ID + "=" + ID);
 
 		Cursor cursor = database.query(ExtendedSQLLiteHelper.CELLTOWER_TABLE,
