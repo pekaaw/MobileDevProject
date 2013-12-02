@@ -100,16 +100,13 @@ public class RoomCheckin {
 						continue;
 					}
 					if (differenceMin[j] < level_margin
-							&& differenceMin[j] > level_margin * -1) {
+							&& differenceMin[j] > level_margin * -1
+							&& differenceMax[j] < level_margin
+							&& differenceMax[j] > level_margin * -1) {
 						valid++;
 						continue;
 					}
 					if (differenceMax[j] == 1024) {
-						continue;
-					}
-					if (differenceMax[j] < level_margin
-							&& differenceMax[j] > level_margin * -1) {
-						valid++;
 						continue;
 					}
 				}
