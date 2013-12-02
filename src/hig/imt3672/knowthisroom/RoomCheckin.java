@@ -100,8 +100,8 @@ public class RoomCheckin {
 						continue;
 					}
 					if (differenceMin[j] < level_margin
-							&& differenceMin[j] > level_margin * -1
 							&& differenceMax[j] < level_margin
+							|| differenceMin[j] > level_margin * -1
 							&& differenceMax[j] > level_margin * -1) {
 						valid++;
 						continue;
