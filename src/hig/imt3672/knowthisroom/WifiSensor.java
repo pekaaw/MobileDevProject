@@ -38,6 +38,7 @@ public class WifiSensor {
 			Log.d("WifiSensor","You have not created an instance.");
 			return null;
 		}
+		Log.d("WifiSensor","Obtained instance.");
 		return mInstance;
 	}
 	
@@ -46,6 +47,7 @@ public class WifiSensor {
 			Log.d("WifiSensor","An instance already exists.");
 			return;
 		}
+		Log.d("WifiSensor","Created instance.");
 		mInstance = new WifiSensor(context);
 	}
 	
@@ -88,7 +90,7 @@ public class WifiSensor {
 				}
 			});
 	
-			Log.i("WifiSensor", "Sorted " + Integer.toString(networks.size())
+			Log.d("WifiSensor", "Sorted " + Integer.toString(networks.size())
 					+ " networks.");
 		}
 		return networks;

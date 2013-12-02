@@ -3,8 +3,13 @@ package hig.imt3672.knowthisroom;
 import java.util.List;
 
 import android.net.wifi.ScanResult;
+import android.os.Bundle;
+import android.util.Log;
 
 public class RoomCheckin {
+	int Invalid;
+	
+	CellTowerData Tower;
 	WifiSensor WifiManager;
 	List<ScanResult> Wifis;
 
@@ -22,6 +27,8 @@ public class RoomCheckin {
 	long roomTowerMax;
 
 	RoomCheckin() {
+		Invalid = 1024;	//Setting a constant, unattainable value.
+		
 		WifiManager = WifiSensor.getInstance();
 		Db = DBOperator.getInstance();
 
@@ -29,7 +36,17 @@ public class RoomCheckin {
 		room_margin = 0.2;
 	}
 
-	public List<DBRoomEntry> GetRooms(long towerId, long towerStrength) {
+	public List<DBRoomEntry> GetRooms() {
+		Bundle Towerinfo = Tower.getCellTowerBundle();
+		long towerId = (Long) Towerinfo.get("CellID");
+		long towerStrength = (Long) Towerinfo.get("Strength");
+		long towerNoise = (Long) Towerinfo.get("cellNoise");
+		
+		Log.d("Checkin","Tower is " + Integer.toString((int) towerId) 
+				+ " with strength " + Integer.toString((int) towerStrength)
+						+ ", " + Integer.toString((int) towerNoise) + " noise."
+						);
+		
 		List<DBRoomEntry> Rooms = Db.getAllDBRoomEntries();
 		int i = 0;
 
@@ -51,7 +68,8 @@ public class RoomCheckin {
 				}
 			}
 
-			if (towerId == roomTowerId && towerStrength <= roomTowerMax
+			if (towerId == roomTowerId 
+					&& towerStrength <= roomTowerMax
 					&& towerStrength >= roomTowerMin) {
 				i++;
 			} else {
@@ -65,11 +83,7 @@ public class RoomCheckin {
 		int valid = 0;
 		Wifis = WifiManager.GetNetworks();
 
-		if (RoomEntries.size() < 1) {
-			return null;
-		}
-
-		do {
+		while (RoomEntries.size() > 1) {
 			int i = 0;
 			while (i != RoomEntries.size()) {
 				long roomId = RoomEntries.get(i).getId();
@@ -80,8 +94,8 @@ public class RoomCheckin {
 				for (int j = 0; j < DBWifis.size(); j++) {
 					// We set the default value to an arbitrary value that it
 					// can never be naturally.
-					differenceMin[j] = 1024;
-					differenceMax[j] = 1024;
+					differenceMin[j] = Invalid;
+					differenceMax[j] = Invalid;
 				}
 
 				for (int j = 0; j < DBWifis.size(); j++) {
@@ -103,7 +117,7 @@ public class RoomCheckin {
 				}
 
 				for (int j = 0; j < DBWifis.size(); j++) {
-					if (differenceMin[j] == 1024) {
+					if (differenceMin[j] == Invalid) {
 						continue;
 					}
 					if (differenceMin[j] < level_margin
@@ -126,7 +140,12 @@ public class RoomCheckin {
 				level_margin = level_margin / 2;
 				room_margin = room_margin / 2;
 			}
-		} while (RoomEntries.size() <= 1);
+		}
+		
+		if(RoomEntries.size() < 1) {
+			return null;
+		}
+		
 		return RoomEntries.get(0);
 	}
 }
