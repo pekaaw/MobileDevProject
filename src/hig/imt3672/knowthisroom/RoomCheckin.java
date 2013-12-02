@@ -87,10 +87,17 @@ public class RoomCheckin {
 				for (int j = 0; j < DBWifis.size(); j++) {
 					for (int k = 0; k < Wifis.size(); k++) {
 						if (DBWifis.get(j).getId() == Wifis.get(k).BSSID) {
+							if (DBWifis.get(j).getMin() < Wifis.get(k).level
+									&& Wifis.get(k).level < DBWifis.get(j)
+											.getMax()) {
+								valid++;
+								continue;
+							}
 							differenceMin[j] = (int) (DBWifis.get(j).getMin() - Wifis
 									.get(k).level);
 							differenceMax[j] = (int) (DBWifis.get(j).getMax() - Wifis
 									.get(k).level);
+
 						}
 					}
 				}
@@ -100,13 +107,10 @@ public class RoomCheckin {
 						continue;
 					}
 					if (differenceMin[j] < level_margin
-							&& differenceMax[j] < level_margin
+							|| differenceMax[j] < level_margin
 							|| differenceMin[j] > level_margin * -1
-							&& differenceMax[j] > level_margin * -1) {
+							|| differenceMax[j] > level_margin * -1) {
 						valid++;
-						continue;
-					}
-					if (differenceMax[j] == 1024) {
 						continue;
 					}
 				}
