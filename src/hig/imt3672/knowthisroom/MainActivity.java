@@ -19,10 +19,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements
-		AddRoomDialog.Communicator, DeleteRoomDialog.Communicator {
+		AddRoomDialog.Communicator, DeleteRoomDialog.Communicator,
+		UpdateRoomDialog.Communicator {
 
 	static MainActivity m_instance;
-	
+
 	List<DBRoomEntry> list_of_rooms;
 	ArrayAdapter<DBRoomEntry> adapter_room_list;
 	Bundle gsmCellData;
@@ -53,8 +54,8 @@ public class MainActivity extends FragmentActivity implements
 		i.putExtra("receiver", resultReceiver);
 		startService(i);
 		WifiSensor.createInstance(this);
-		//GplusHandler mPlus = new GplusHandler();
-		//mPlus.init();
+		// GplusHandler mPlus = new GplusHandler();
+		// mPlus.init();
 		// mPlus.postRoom("Jakob");
 	}
 
@@ -122,13 +123,12 @@ public class MainActivity extends FragmentActivity implements
 		case R.id.add_room_menu_btn:
 			addRoomNameDialog(item.getActionView());
 			return true;
-			
+
 		case R.id.plus_connection:
 			Log.d("#MainActivity#", "try to connect");
 			try {
 				ServiceHandler.getInstance().gplus_connect();
-			}
-			catch( Exception e ) {
+			} catch (Exception e) {
 				// Do nothing. What happend was probably that the service had
 				// yet to be created so getInstance returned null
 				// @nullPointerException
@@ -138,11 +138,10 @@ public class MainActivity extends FragmentActivity implements
 		case R.id.plus_disconnection:
 			try {
 				ServiceHandler.getInstance().gplus_disconnect();
-			}
-			catch( Exception e ) {
+			} catch (Exception e) {
 				// Do nothing.
 			}
-			
+
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -151,25 +150,25 @@ public class MainActivity extends FragmentActivity implements
 	public static MainActivity getInstance() {
 		return m_instance;
 	}
-	
-	@Override
-    protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
-		/**
-		 * If we previously failed to connect to G+ and response now is OK, 
-		 * we set the connectionResult in the service to null and try to connect again.
-		 * [ I don't know what I'm doing here... ]
-		 */
-        if (requestCode == GplusHandler.REQUEST_CODE_RESOLVE_ERR && responseCode == RESULT_OK) {
-        	try {
-        		ServiceHandler.getInstance().setConnectionResult(null);
-        		ServiceHandler.getInstance().getPlusClient().connect();
-        	}
-        	catch ( Exception e ) {
-        		// in case something fails, don't make phone explode (hopefully)
-        	}
-        }
-    }
 
+	@Override
+	protected void onActivityResult(int requestCode, int responseCode,
+			Intent intent) {
+		/**
+		 * If we previously failed to connect to G+ and response now is OK, we
+		 * set the connectionResult in the service to null and try to connect
+		 * again. [ I don't know what I'm doing here... ]
+		 */
+		if (requestCode == GplusHandler.REQUEST_CODE_RESOLVE_ERR
+				&& responseCode == RESULT_OK) {
+			try {
+				ServiceHandler.getInstance().setConnectionResult(null);
+				ServiceHandler.getInstance().getPlusClient().connect();
+			} catch (Exception e) {
+				// in case something fails, don't make phone explode (hopefully)
+			}
+		}
+	}
 
 	/**
 	 * addRoomNameDialog - Open a dialog to name a new Room
@@ -202,6 +201,13 @@ public class MainActivity extends FragmentActivity implements
 		DeleteRoomDialog deleteRoomDialog = DeleteRoomDialog.newInstance(room,
 				listID);
 		deleteRoomDialog.show(manager, "delete_room_dialog_id");
+	}
+
+	public void updateRoomDialog(View view, DBRoomEntry room, int listID) {
+		FragmentManager manager = getFragmentManager();
+		UpdateRoomDialog updateRoomDialog = UpdateRoomDialog.newInstance(room,
+				listID);
+		updateRoomDialog.show(manager, "update_room_dialog_id");
 	}
 
 	/**
@@ -261,7 +267,7 @@ public class MainActivity extends FragmentActivity implements
 		// TODO: Add name to new instance, then add celltower and wifi networks.
 
 		// Toast to debug purposes. To be deleted..
-		
+
 	}
 
 	/**
@@ -291,6 +297,26 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	@Override
+	public void onUpdateCommandReceived(Boolean command, DBRoomEntry room,
+			int listID) {
+		if (command == true) {
+
+			if (gsmCellData == null) {
+				Toast.makeText(this,
+						"Please try again, not enough data recieved",
+						Toast.LENGTH_SHORT).show();
+				return;
+			}
+
+			database.updateRoom(room, gsmCellData);
+
+			Toast.makeText(this,
+					"The room: '" + room.getName() + "' was updated.",
+					Toast.LENGTH_LONG).show();
+		}
+	}
+
+	@Override
 	protected void onDestroy() {
 		database.close();
 		super.onDestroy();
@@ -311,10 +337,11 @@ public class MainActivity extends FragmentActivity implements
 			}
 		}
 	}
-	
+
 	interface toService {
 		public void gplus_connect();
+
 		public void gplus_disconnect();
 	}
-	
+
 }

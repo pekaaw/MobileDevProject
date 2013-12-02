@@ -12,6 +12,14 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:text="@string/delete_room" />
+    
+    <Button
+        android:id="@+id/update_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:text="@string/update_room" />
 
     <TextView
         android:id="@+id/detailed_room"

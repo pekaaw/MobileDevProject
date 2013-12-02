@@ -7,8 +7,10 @@
     <string name="gplus_disconnect">Disconnect from G+</string>
     <string name="add_room">Add room</string>
     <string name="delete_room">Delete room</string>
+    <string name="update_room">This is where I am!</string>
     <string name="add_room_instruction">Room name:</string>
     <string name="delete_room_headline">Really delete room?</string>
+    <string name="update_room_headline">Do you really want to update this with the current data in the censors room?</string>
     <string name="detailed_room_headline">"Details of "</string>
     <string name="detailed_tower_header">CellTower info:</string>
     <string name="detailed_wifi_header">Wifi info:</string>

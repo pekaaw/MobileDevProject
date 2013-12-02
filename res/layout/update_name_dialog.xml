@@ -1,0 +1,41 @@
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:id="@+id/dialog_update_room"
+        android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical"
+	    android:padding="10sp"
+	    android:layout_margin="1dp"
+	    android:background="@android:color/background_light" >
+	    
+	    <TextView
+	        android:id="@+id/update_room_instruction"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/update_room_headline"
+	        android:textSize="30sp" />
+	    
+	    <LinearLayout 
+	        android:orientation="horizontal"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        style="?android:attr/buttonBarStyle">
+	        
+		    <Button
+		        android:id="@+id/update_room_cancel"
+		        style="?android:attr/buttonBarButtonStyle"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:text="@android:string/cancel" />
+	            
+		    <Button
+		        android:id="@+id/update_room_ok"
+		        style="?android:attr/buttonBarButtonStyle"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:text="@android:string/ok" />
+		    
+		</LinearLayout>
+	
+	</LinearLayout>
