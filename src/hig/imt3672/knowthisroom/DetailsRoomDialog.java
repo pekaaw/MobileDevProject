@@ -1,6 +1,7 @@
 package hig.imt3672.knowthisroom;
 
-import android.app.Activity;
+import java.util.List;
+
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
@@ -9,11 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ListView;
 
 public class DetailsRoomDialog extends DialogFragment implements View.OnClickListener{
 	
 	DBRoomEntry m_room = null;
 	int m_listID;
+	ListView m_listView = null;
 		
 	static DetailsRoomDialog newInstance( DBRoomEntry room, int listID ) {
 
@@ -51,8 +54,23 @@ public class DetailsRoomDialog extends DialogFragment implements View.OnClickLis
 		getDialog().setTitle(headline);
 
 		// Inflate layout and activate the delete-button
-		View m_view = inflater.inflate(R.layout.detailed_room, null);
+		View m_view = inflater.inflate(R.layout.details_room_dialog, null);
 		m_view.findViewById(R.id.delete_button).setOnClickListener(this);
+		
+		List<DBWifiInRoomEntry> wifiList;
+		
+		try {
+			wifiList = DBOperator.getInstance().getWifi( m_room.getId() );
+		}
+		catch( Exception e ) {
+			Log.d("#DetailsRoomDialog#", "Exception: " + e.getMessage() );
+			return m_view;
+		}
+		
+		m_listView = (ListView) m_view.findViewById(R.id.details_room_wifi_list);
+		
+		DetailsAdapter adapter = new DetailsAdapter(getActivity(), wifiList);
+		m_listView.setAdapter( adapter );
 		
 		return m_view;
 	}
@@ -60,7 +78,7 @@ public class DetailsRoomDialog extends DialogFragment implements View.OnClickLis
 	@Override
 	public void onStart() {
 		// TODO: create icon for viewing details about a room and set it here instead of delete_room
-		getDialog().getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.delete_room);
+		getDialog().getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.info_room);
 		super.onStart();
 	}
 	

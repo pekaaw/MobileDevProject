@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/details_room_dialog_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
+	android:layout_marginLeft="@dimen/activity_horizontal_margin"
+	android:layout_marginRight="@dimen/activity_horizontal_margin"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical" >
+
+    <RelativeLayout 
+        android:id="@+id/details_room_dialog_header"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin" >
+        
+		<TextView
+	        android:id="@+id/details_room_visible_networks_header"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+			android:layout_marginLeft="@dimen/activity_horizontal_margin"
+	        android:layout_alignParentLeft="true"
+	        android:layout_centerVertical="true"
+	        android:textSize="@dimen/font_size"
+	        android:text="@string/details_room_visible_networks" />
+	    
+	    <ImageView 
+	        android:id="@+id/wifi_logo"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginRight="@dimen/activity_horizontal_margin"
+			android:layout_alignParentRight="true"
+			android:contentDescription="@null"
+			android:src="@drawable/x_wifi"
+	        />
+
+    </RelativeLayout>
+
+    	<TextView 
+	    android:id="@+id/details_room_bsid"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+		android:layout_marginLeft="@dimen/activity_horizontal_margin"
+	    android:layout_alignParentLeft="true"
+	    android:layout_below="@id/details_room_dialog_header"
+	    android:textSize="@dimen/font_size"
+	    android:text="@string/details_room_bsid" />
+	
+	<TextView 
+	    android:id="@+id/details_room_strength"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+		android:layout_marginRight="@dimen/activity_horizontal_margin"
+	    android:layout_alignParentRight="true"
+	    android:layout_below="@id/details_room_dialog_header"
+	    android:textSize="@dimen/font_size"
+	    android:text="@string/details_room_strength" />
+    
+	<ListView
+		android:id="@+id/details_room_wifi_list"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="@dimen/activity_horizontal_margin"
+		android:layout_marginRight="@dimen/activity_horizontal_margin"
+		android:layout_below="@+id/details_room_bsid"
+		android:layout_above="@+id/delete_button" />
+  
+	<Button
+        android:id="@+id/delete_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:text="@string/delete_room" />
+  
+</RelativeLayout>
