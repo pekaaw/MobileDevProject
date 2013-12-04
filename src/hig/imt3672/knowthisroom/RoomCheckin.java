@@ -67,14 +67,15 @@ public class RoomCheckin {
 
 	//Filters out rooms based on celltower data
 	public List<DBRoomEntry> GetRooms() {
+		Tower = ServiceHandler.getInstance().m_CellTowerHander.mCellTowerData;
 		Bundle Towerinfo = Tower.getCellTowerBundle();
-		long towerId = (Long) Towerinfo.get("CellID");
-		long towerStrength = (Long) Towerinfo.get("Strength");
-		long towerNoise = (Long) Towerinfo.get("cellNoise");
+		Integer towerId = Towerinfo.getInt("CellID");
+		Integer towerStrength = Towerinfo.getInt("Strength");
+		Integer towerNoise = Towerinfo.getInt("cellNoise");
 		
-		Log.d("Checkin","Tower is " + Integer.toString((int) towerId) 
-				+ " with strength " + Integer.toString((int) towerStrength)
-						+ ", " + Integer.toString((int) towerNoise) + " noise."
+		Log.d("Checkin","Tower is " + Integer.toString( towerId ) 
+				+ " with strength " + Integer.toString( towerStrength )
+						+ ", " + Integer.toString( towerNoise ) + " noise."
 						);
 		
 		List<DBRoomEntry> Rooms = Db.getAllDBRoomEntries();
