@@ -266,7 +266,8 @@ public class DBOperator { // Handles normal usage of the database
 		List<DBRoomEntry> rooms = new ArrayList<DBRoomEntry>();
 
 		Cursor cursor = database.query(ExtendedSQLLiteHelper.ROOM_TABLE,
-				allRooms, null, null, null, null, null);
+				allRooms, null, null, null, null,
+				ExtendedSQLLiteHelper.ROOM_COLUMN_NAME + " ASC");
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
