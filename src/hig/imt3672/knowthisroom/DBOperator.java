@@ -168,7 +168,7 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	public boolean updateWifi(String BSID, long roomId, int signalStrenght) {
-
+		// TODO updatewifi
 		// CHECK IF THE WIFI EXISTS BEFORE YOU RUN THIS FUNCTION
 
 		ContentValues wifiValues = new ContentValues();
@@ -193,6 +193,7 @@ public class DBOperator { // Handles normal usage of the database
 		// String(roomId) });
 		cursor.moveToFirst();
 		long DBmax = cursorToLong(cursor);
+
 		cursor = database.rawQuery(WIFI_GET_MIN, null);// new String[] { BSID,
 		// String(roomId) });
 		cursor.moveToFirst();
@@ -258,7 +259,6 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	private String String(long roomId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -266,7 +266,8 @@ public class DBOperator { // Handles normal usage of the database
 		List<DBRoomEntry> rooms = new ArrayList<DBRoomEntry>();
 
 		Cursor cursor = database.query(ExtendedSQLLiteHelper.ROOM_TABLE,
-				allRooms, null, null, null, null, null);
+				allRooms, null, null, null, null,
+				ExtendedSQLLiteHelper.ROOM_COLUMN_NAME + " ASC");
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
@@ -372,6 +373,7 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	// :::::::::cursor for wifi::::::::::
+	// TODO GETWIFI
 	public List<DBWifiInRoomEntry> getWifi(long roomId) {
 		List<DBWifiInRoomEntry> returnList = new ArrayList<DBWifiInRoomEntry>();
 
@@ -379,7 +381,8 @@ public class DBOperator { // Handles normal usage of the database
 				+ "=" + roomId);
 
 		Cursor cursor = database.query(ExtendedSQLLiteHelper.WIFI_ROOM_TABLE,
-				null, whereStatement, null, null, null, null);
+				null, whereStatement, null, null, null,
+				ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN + " DESC");
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {

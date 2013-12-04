@@ -47,8 +47,8 @@ public class WifiSensor {
 			Log.d("WifiSensor","An instance already exists.");
 			return;
 		}
-		Log.d("WifiSensor","Created instance.");
 		mInstance = new WifiSensor(context);
+		Log.d("WifiSensor","Created instance.");
 	}
 	
 	private WifiSensor(Context context) {
