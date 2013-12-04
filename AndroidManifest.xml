@@ -38,6 +38,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="hig.imt3672.knowthisroom.SettingsActivity"
+			android:label="@string/action_settings" 
+            android:parentActivityName="hig.imt3672.knowthisroom.MainActivity" >
+        </activity>
 	</application>
 
 </manifest>

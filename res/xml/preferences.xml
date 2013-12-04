@@ -1,0 +1,28 @@
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+        
+    <PreferenceCategory
+        android:title="@string/settings_category_posting">
+        
+		<CheckBoxPreference
+		      android:key="checkbox_weblink"
+		      android:title="@string/settings_post_to_weblink" />
+		
+		<EditTextPreference 
+		    android:key="text_weblink"
+		    android:title="@string/settings_server_weblink"
+		    android:dialogTitle="@string/settings_server_weblink"/>
+		
+		<CheckBoxPreference 
+		    android:key="checkbox_gplus_moments"
+		    android:title="@string/settings_post_to_gplus_moments" />
+		
+		<CheckBoxPreference 
+		    android:key="checkbox_gplus_stream"
+		    android:title="@string/settings_post_to_gplus_stream"/>
+
+				
+        
+    </PreferenceCategory>
+    
+</PreferenceScreen>
