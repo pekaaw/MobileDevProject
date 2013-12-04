@@ -50,6 +50,12 @@ public class UpdateRoomDialog extends DialogFragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
+		// Ask the wifisensor to start a new scan. Hopefully we have fresh results
+		// from the room we're in when the user has acknowledged the update. 
+		// Probably this scan wouldn't finish in time, so we will also scan when 
+		// entering detailedView.
+		Utils.startWifiScan();
+
 		getDialog().getWindow().requestFeature(Window.FEATURE_LEFT_ICON);
 		getDialog().setTitle(R.string.update_room_headline);
 

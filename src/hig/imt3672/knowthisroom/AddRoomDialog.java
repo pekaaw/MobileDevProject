@@ -43,7 +43,9 @@ public class AddRoomDialog extends DialogFragment implements View.OnClickListene
 		m_view.findViewById(R.id.add_room_ok).setOnClickListener(this);
 		m_view.findViewById(R.id.add_room_cancel).setOnClickListener(this);
 		
-		setCancelable(false);
+		// Ask the wifisensor to start a new scan. Hopefully we have fresh results
+		// from the room we're in when the user is finished typing it's name.
+		Utils.startWifiScan();
 		
 		return m_view;
 

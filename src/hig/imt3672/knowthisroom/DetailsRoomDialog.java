@@ -48,6 +48,10 @@ public class DetailsRoomDialog extends DialogFragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
+		// Ask the wifisensor to start a new scan. In this way we can have some
+		// fresh data if the user wants to update wifi-info for the room.
+		Utils.startWifiScan();
+		
 		// Set title and commit the icon-change
 		getDialog().getWindow().requestFeature(Window.FEATURE_LEFT_ICON);
 
