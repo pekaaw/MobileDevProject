@@ -94,6 +94,8 @@ public class DetailsRoomDialog extends DialogFragment implements
 
 	@Override
 	public void onClick(View v) {
+		
+		// for the delete button: Create a deleteDialog and show it
 		if (v.getId() == R.id.delete_button) {
 			dismiss();
 			FragmentManager manager = getFragmentManager();
@@ -101,6 +103,8 @@ public class DetailsRoomDialog extends DialogFragment implements
 					m_room, m_listID);
 			deleteRoomDialog.show(manager, "delete_room_dialog_id");
 		}
+		
+		// for the update button: Create a updateRoomDialog and show it
 		if (v.getId() == R.id.update_button) {
 			dismiss();
 			FragmentManager manager = getFragmentManager();

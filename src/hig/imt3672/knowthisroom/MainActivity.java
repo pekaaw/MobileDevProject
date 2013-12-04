@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements
@@ -275,6 +276,22 @@ public class MainActivity extends FragmentActivity implements
 
 		// Toast to debug purposes. To be deleted..
 
+	}
+	
+	/**
+	 * Display what room we think we're in
+	 * @param nameOfRoom The name we want to display
+	 */
+	public void setFoundRoomToName( String nameOfRoom ) {
+		TextView displayedRoom = (TextView) findViewById( R.id.found_room_name );
+		
+		// try to set text ( expects NullPointerException if string is null )
+		try{
+			displayedRoom.setText( nameOfRoom );
+		}
+		catch( NullPointerException e ) {
+			Log.d("#MainActivity#", "setFoundRoomToName: " + e.getMessage() );
+		}
 	}
 
 	/**

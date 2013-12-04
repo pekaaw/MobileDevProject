@@ -36,6 +36,7 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 	// other variables
 	WifiSensor m_WifiSensor = null;
 	DBOperator m_Database = null;
+	RoomCheckin m_RoomFinder = null;
 	private static Timer m_scheduledTask = null;
 	
 	// run algorithm each 60 second
@@ -76,10 +77,12 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 		// Make sure instances of singletons is instantiated
 		WifiSensor.createInstance(this);
 		DBOperator.createInstance(this);
+		RoomCheckin.createInstance(this);
 		
 		// Get the singletons that we need a handle to
 		m_WifiSensor = WifiSensor.getInstance();
 		m_Database = DBOperator.getInstance();
+		m_RoomFinder = RoomCheckin.getInstance();
 		
 		// Initialize classes the service is responsible for
 		m_CellTowerHander = new CellTowerHandler();
@@ -237,6 +240,22 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 		
 		@Override
 		public void run() {
+			// ToDo: Fill with action, run algorithm and do stuff accordingly
+			
+			// Get roomFinder
+			RoomCheckin roomFinder = RoomCheckin.getInstance();
+			
+			// find room we're in
+			DBRoomEntry room = roomFinder.GetRoom( roomFinder.GetRooms() );
+			
+			// Try to push it to MainActivity for display, or log exception
+			try {
+				MainActivity.getInstance().setFoundRoomToName( room.getName() );
+			}
+			catch( NullPointerException e ) {
+				Log.d("#FindThisRoomAction#", "setFoundRoomToName: " + e.getMessage() );
+			}
+			
 			Log.d("#FindThisRoomAction#", "I'm running!");
 		}
 	}
