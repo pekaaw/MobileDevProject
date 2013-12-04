@@ -9,10 +9,48 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
+    <RelativeLayout 
+        android:id="@+id/in_room_viewer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_horizontal_margin">
+        
+        <TextView
+            android:id="@+id/found_room_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/update_room" />
+        
+        <TextView 
+            android:id="@+id/found_room_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/found_wrong_room_btn"
+            android:layout_alignBottom="@id/found_wrong_room_btn"
+            android:textSize="@dimen/font_size"
+			android:text="@string/update_room_not_found" />
+
+        <ImageButton
+            android:id="@id/found_wrong_room_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:contentDescription="@string/update_room_wrong_btn"
+            android:src="@android:drawable/ic_menu_edit" />
+
+    </RelativeLayout>
+    
+    <View
+        android:layout_width="fill_parent"
+		android:layout_height="1dp"
+		android:layout_below="@id/in_room_viewer"
+		android:background="@android:color/darker_gray" />
+    
     <ListView
         android:id="@+id/listRooms"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/in_room_viewer"
         android:layout_centerHorizontal="true" >
 
     </ListView>

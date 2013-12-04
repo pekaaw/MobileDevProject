@@ -6,7 +6,9 @@
     <string name="gplus_disconnect">Disconnect from G+</string>
     <string name="add_room">Add room</string>
     <string name="delete_room">Delete room</string>
-    <string name="update_room">This is where I am!</string>
+    <string name="update_room">This is where I am:</string>
+    <string name="update_room_not_found">"I don't know yet&#8230;"</string>
+    <string name="update_room_wrong_btn">Wrong room?</string>
     <string name="add_room_instruction">Room name:</string>
     <string name="delete_room_headline">Really delete room?</string>
     <string name="update_room_headline">Do you really want to update this with the current data in the censors room?</string>
