@@ -397,6 +397,43 @@ public class DBOperator { // Handles normal usage of the database
 		return returnList;
 
 	}
+	
+	/**
+	 * Returns a list of strings with the BSID of each wifi network stored for a specific room.
+	 * <p>
+	 * @param roomId Id of the room
+	 * @return List<String> with BSID's as strings
+	 */
+	public List<String> getWifiBsIDs(long roomId) {
+		
+		// List to return - with name of BSID's
+		List<String> wifiNameList = new ArrayList<String>();
+		
+		// Specify statement and run query
+		String whereStatement = (ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID + "=" + roomId);
+		Cursor cursor = database.query( ExtendedSQLLiteHelper.WIFI_ROOM_TABLE, 
+										null, whereStatement, null, null, null, 
+										ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN + " DESC");
+		
+		// go to start of cursor
+		cursor.moveToFirst();
+		
+		// run through to we get to end
+		while( !cursor.isAfterLast() ) {
+			
+			// find wifi and add the string of the BSID to the list
+			DBWifiInRoomEntry wifi = cursorToDBWifiInRoomEntry(cursor);
+			wifiNameList.add( wifi.getId() );
+			
+			// then move on
+			cursor.moveToNext();
+		}
+		
+		// close cursor
+		cursor.close();
+		
+		return wifiNameList;		
+	}
 
 	public boolean wifiExists(long roomId, String BsID) {
 		// i was hoping to do this on the server but i can't find a way to do
