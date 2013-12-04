@@ -1,5 +1,8 @@
 package hig.imt3672.knowthisroom;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Intent;
@@ -26,18 +29,20 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 	PlusClient m_PlusClient;
 	ConnectionResult m_ConnectionResult;
 	
-	
-	public PlusClient getPlusClient() {
-		return m_PlusClient;
-	}
-
-	public void setConnectionResult(ConnectionResult m_ConnectionResult) {
-		this.m_ConnectionResult = m_ConnectionResult;
-	}
-
 	// Classes that the service is responsible for:
 	CellTowerHandler m_CellTowerHander = null;
 	GplusHandler m_GplusHandler = null;
+	
+	// other variables
+	WifiSensor m_WifiSensor = null;
+	DBOperator m_Database = null;
+	private static Timer m_scheduledTask = null;
+	
+	// run algorithm each 60 second
+	static long TIMER_LENGTH_MILLISECONDS = 60000;
+	
+	// Wait 2 seconds to retrieve networks
+	static long TIME_TO_GET_NETWORKS = 2000;
 	
 	// Empty constructor
 	public ServiceHandler() {}
@@ -68,8 +73,13 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 			return Service.START_NOT_STICKY;
 		}
 		
+		// Make sure instances of singletons is instantiated
 		WifiSensor.createInstance(this);
 		DBOperator.createInstance(this);
+		
+		// Get the singletons that we need a handle to
+		m_WifiSensor = WifiSensor.getInstance();
+		m_Database = DBOperator.getInstance();
 		
 		// Initialize classes the service is responsible for
 		m_CellTowerHander = new CellTowerHandler();
@@ -81,21 +91,29 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 		m_CellTowerHander.m_ResultReceiver = intent.getParcelableExtra("receiver");
 		m_CellTowerHander.mCellTowerData.addObserver(m_CellTowerHander);
 
+		// schedule a task, each 1 minute we want the algorithm to run,
+		// compare networks and find room, post if different than before.
+		m_scheduledTask = new Timer();
+		m_scheduledTask.scheduleAtFixedRate(new StartFindThisRoomAction(), 0, TIMER_LENGTH_MILLISECONDS);
 
 		Log.d("###", "Service started.");
 		
 		return Service.START_NOT_STICKY;
 	}
 	
+	/*
+	 * Must-be-implemented method of a Service
+	 * (non-Javadoc)
+	 * @see android.app.Service#onBind(android.content.Intent)
+	 */
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
 	
-	public static ServiceHandler getInstance() {
-		return m_instance;
-	}
-
+	/*
+	 * This runs when the service is stopped and destroyed.
+	 */
 	@Override
 	public void onDestroy() {
 		m_PlusClient.disconnect();
@@ -103,6 +121,29 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 		super.onDestroy();
 	}
 	
+	/**
+	 * getInstance()
+	 * <p>
+	 * Returns a static pointer to this service. We can call it a hack, but it
+	 * is used in MainActivity for communication between the activity and the
+	 * service.
+	 * @return this instance of ServiceHandler
+	 */
+	public static ServiceHandler getInstance() {
+		return m_instance;
+	}
+	
+	public PlusClient getPlusClient() {
+		return m_PlusClient;
+	}
+
+	public void setConnectionResult(ConnectionResult m_ConnectionResult) {
+		this.m_ConnectionResult = m_ConnectionResult;
+	}
+	
+	/*
+	 * Called when there was an error connecting the PlusClient to the service.
+	 */
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
 		Log.d("#Service#", "Connection failed.");
@@ -120,6 +161,11 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 		m_ConnectionResult = result;		
 	}
 
+	/**
+	 * onConnected
+	 * <p>
+	 * This method is called when a connection to G+ has been established
+	 */
 	@Override
 	public void onConnected(Bundle connectionHint) {
 		Log.d("#Service#", "Got connected.");
@@ -127,12 +173,20 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 
 	}
 
+	/**
+	 * onDisconnected
+	 * <p>
+	 * This method is called if a connection to G+ has failed
+	 */
 	@Override
 	public void onDisconnected() {
 		Log.d("#Service#", "Got disconnected.");
 		
 	}
 
+	/**
+	 * Connect to Google Plus through the PlusClient
+	 */
 	@Override
 	public void gplus_connect() {
 		Log.d("Service", "connection! we look for you");
@@ -140,10 +194,51 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 				
 	}
 
+	/**
+	 * Disconnect from Google Plus through the PlusClient
+	 * TODO: This doesn't work.
+	 */
 	@Override
 	public void gplus_disconnect() {
 		Log.d("#Service#", "Try to disconnect.");
 		m_PlusClient.disconnect();
+	}
+	
+	
+	/**
+	 * StartFindThisRoomAction
+	 * <p>
+	 * Run a network scan, wait for TIME_TO_GET_NETWORKS, then start FindThisRoomAction()
+	 * @author Pekaaw
+	 *
+	 */
+	class StartFindThisRoomAction extends TimerTask {
+		
+		@Override
+		public void run() {
+			m_WifiSensor.startScan();
+			Timer startAction = new Timer();
+			startAction.schedule(new FindThisRoomAction(), TIME_TO_GET_NETWORKS);
+		}
+	}
+	
+	/**
+	 * FindThisRoomAction
+	 * <p>
+	 * This is what we want the service to do at a given interval.
+	 * 1. compare network data to find what room we're in
+	 * 2. if different from before
+	 * 2.1  change room
+	 * 2.2  post to Internet
+	 * @author Pekaaw
+	 *
+	 */
+	class FindThisRoomAction extends TimerTask {
+		
+		@Override
+		public void run() {
+			Log.d("#FindThisRoomAction#", "I'm running!");
+		}
 	}
 
 }

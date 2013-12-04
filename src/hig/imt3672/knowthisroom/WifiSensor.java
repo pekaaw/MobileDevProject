@@ -64,7 +64,6 @@ public class WifiSensor {
             {
         		Log.d("WifiSensor", "Networks found!");
             	networks = wifi.getScanResults();
-            	wifi.startScan();
             	size = networks.size();
         		Log.d("WifiSensor", "Networks: " + Integer.toString(size));
             }
@@ -99,5 +98,13 @@ public class WifiSensor {
 	
 	public int GetSize() {
 		return size;
+	}
+
+	/**
+	 * Start wifi scan from outside this class
+	 * @author PK
+	 */
+	public void startScan() {
+		wifi.startScan();
 	}
 }
