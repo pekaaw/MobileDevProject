@@ -64,14 +64,32 @@
 		android:layout_marginLeft="@dimen/activity_horizontal_margin"
 		android:layout_marginRight="@dimen/activity_horizontal_margin"
 		android:layout_below="@+id/details_room_bsid"
-		android:layout_above="@+id/delete_button" />
+		android:layout_above="@+id/details_buttons" />
   
-	<Button
-        android:id="@+id/delete_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+	<LinearLayout 
+	    android:id="@id/details_buttons"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_margin="@dimen/activity_horizontal_margin"
-        android:text="@string/delete_room" />
+        style="?android:attr/buttonBarStyle" >
+	    
+		<Button
+		    android:id="@+id/delete_button"
+		    android:layout_width="match_parent"
+		    android:layout_height="fill_parent"
+		    android:layout_weight="1"
+		    android:text="@string/delete_room" 
+		    style="?android:attr/buttonBarButtonStyle" />
+		
+		<Button
+		    android:id="@+id/update_button"
+		    android:layout_width="match_parent"
+		    android:layout_height="fill_parent"
+		    android:layout_weight="1"
+		    android:text="@string/update_room" 
+		    style="?android:attr/buttonBarButtonStyle" />
+
+	</LinearLayout>
   
 </RelativeLayout>

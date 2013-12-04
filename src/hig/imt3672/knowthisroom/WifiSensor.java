@@ -64,6 +64,7 @@ public class WifiSensor {
             {
         		Log.d("WifiSensor", "Networks found!");
             	networks = wifi.getScanResults();
+            	wifi.startScan();
             	size = networks.size();
         		Log.d("WifiSensor", "Networks: " + Integer.toString(size));
             }

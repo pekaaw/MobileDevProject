@@ -141,7 +141,7 @@ public class DBOperator { // Handles normal usage of the database
 		DBnetworkList = this.getWifi(room.getId());
 
 		// prepare list of new networks
-		networkListToAdd = getDifferenceWifi(networkList, DBnetworkList);
+		networkListToAdd = getDifferenceWifi(DBnetworkList, networkList);
 
 		// add new networks
 		for (DBWifiInRoomEntry item : networkListToAdd) {
@@ -458,35 +458,20 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	private List<DBWifiInRoomEntry> getDifferenceWifi(
-			List<DBWifiInRoomEntry> list1, List<DBWifiInRoomEntry> list2) {
+			List<DBWifiInRoomEntry> dbList, List<DBWifiInRoomEntry> inList) {
 
 		List<DBWifiInRoomEntry> returnList = new ArrayList<DBWifiInRoomEntry>();
 		boolean exists;
-		if (list1.size() > list2.size()) {
-			for (DBWifiInRoomEntry item1 : list1) {
-				exists = false;
-				for (DBWifiInRoomEntry item2 : list2) {
-					if (item1.getId().equals(item2.getId())) {
-						exists = true;
-					}
-				}
-				if (exists == false) {
-					returnList.add(item1);
+		for (DBWifiInRoomEntry inItem : inList) {
+			exists = false;
+			for (DBWifiInRoomEntry oldItem : dbList) {
+				if (inItem.getId().equals(oldItem.getId())) {
+					exists = true;
 				}
 			}
-		} else {
-			for (DBWifiInRoomEntry item2 : list2) {
-				exists = false;
-				for (DBWifiInRoomEntry item1 : list1) {
-					if (item2.getId() == item1.getId()) {
-						exists = true;
-					}
-				}
-				if (exists == false) {
-					returnList.add(item2);
-				}
+			if (exists == false) {
+				returnList.add(inItem);
 			}
-
 		}
 
 		return returnList;
