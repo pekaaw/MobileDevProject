@@ -140,7 +140,9 @@ public class MainActivity extends FragmentActivity implements
 				ServiceHandler.getInstance().gplus_disconnect();
 			} catch (Exception e) {
 				// Do nothing.
+				Log.d("#MainActivity#", "gplus_disconnect() could not be executed.");
 			}
+			return true;
 			
 		case R.id.action_settings:
 			Intent intent = new Intent(this, SettingsActivity.class);
