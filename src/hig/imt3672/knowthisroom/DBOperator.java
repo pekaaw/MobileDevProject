@@ -267,7 +267,8 @@ public class DBOperator { // Handles normal usage of the database
 
 		Cursor cursor = database.query(ExtendedSQLLiteHelper.ROOM_TABLE,
 				allRooms, null, null, null, null,
-				ExtendedSQLLiteHelper.ROOM_COLUMN_NAME + " ASC");
+				ExtendedSQLLiteHelper.ROOM_COLUMN_NAME + " COLLATE NOCASE");// +
+																			// " ASC");
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
