@@ -90,19 +90,26 @@ public class RoomCheckin {
 			Celltowers = Db.getCellTowers(roomId);
 
 			for (int j = 0; j < Celltowers.size(); j++) {
-				roomTowerId = Celltowers.get(j).getId();
+				roomTowerId = Celltowers.get(j).getTowerId();
 				roomTowerMin = Celltowers.get(j).getMin();
 				roomTowerMax = Celltowers.get(j).getMax();
 				if (towerId == roomTowerId 
-						&& (towerStrength+towerNoise) <= roomTowerMax
-						&& (towerStrength-towerNoise) >= roomTowerMin) {
+						&& (towerStrength+towerNoise) >= roomTowerMax
+						&& (towerStrength-towerNoise) <= roomTowerMin) {
 					break;
 				}
 			}
 
+			// at this point we either have the last room or a room that
+			// gave match (have at least one matching celltower). If we
+			// don't pass this test the room gets removed, but if we pass
+			// it, then the while-loop will check next item.
+			// By removing like this we will at the end only have left
+			// the rooms that had matching celltowers in range.
+			// !!NOTE!! lower number means stronger signal !!NOTE!!
 			if (towerId == roomTowerId 
-					&& (towerStrength+towerNoise) <= roomTowerMax
-					&& (towerStrength-towerNoise) >= roomTowerMin) {
+					&& (towerStrength+towerNoise) >= roomTowerMax
+					&& (towerStrength-towerNoise) <= roomTowerMin) {
 				i++;
 			} else {
 				Rooms.remove(i);
@@ -113,6 +120,20 @@ public class RoomCheckin {
 
 	//Filters out a list of rooms to leave it with 0 or 1 rooms
 	public DBRoomEntry GetRoom(List<DBRoomEntry> RoomEntries) {
+		
+		// If input it not valid, return an empty DBRoomEntry
+		if( RoomEntries == null )
+		{
+			return null;
+			//return new DBRoomEntry();
+		}
+		
+		String dbBSSID;
+		String myBSSID;
+		Long dbWifiMax;
+		Long dbWifiMin;
+		Integer myWifiLevel;
+		
 		int valid = 0;
 		Wifis = WifiManager.GetNetworks();
 
@@ -146,24 +167,32 @@ public class RoomCheckin {
 				//if it's between "minimum" and "maximum" values
 				for (int j = 0; j < DBWifis.size(); j++) {
 					for (int k = 0; k < Wifis.size(); k++) {
-						if (DBWifis.get(j).getId() == Wifis.get(k).BSSID) {
-							
+						
+						// Get BSSID's to compare
+						dbBSSID = DBWifis.get(j).getId();
+						myBSSID = Wifis.get(k).BSSID;
+						
+						if ( dbBSSID.equals( myBSSID ) ) {
+
+							// Get different signal strengths
+							dbWifiMin = DBWifis.get(j).getMin();
+							dbWifiMax = DBWifis.get(j).getMax();
+							myWifiLevel = Wifis.get(k).level;
+
 							//If the wifi is valid its value remains "Invalid" internally
 							//so we don't check it again later, thus it cannot add "valid++" twice.
-							if (DBWifis.get(j).getMin() < Wifis.get(k).level
-									&& Wifis.get(k).level < DBWifis.get(j)
-											.getMax()) {
+							if (dbWifiMin <= myWifiLevel
+									&& myWifiLevel <= dbWifiMax ) {
 								valid++;
 								continue;
 							}
 							
 							//If it did not pass the previous if statement we set the value
 							//to something other than "Invalid"
-							differenceMin[j] = (int) (DBWifis.get(j).getMin() - Wifis
-									.get(k).level);
-							differenceMax[j] = (int) (DBWifis.get(j).getMax() - Wifis
-									.get(k).level);
+							differenceMin[j] = (int) (dbWifiMin - myWifiLevel);
+							differenceMax[j] = (int) (dbWifiMax - myWifiLevel);
 
+							k = Wifis.size();
 						}
 					}
 				}

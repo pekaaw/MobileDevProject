@@ -6,12 +6,12 @@ public class DBCelltowerEntry {
 	private long min;
 	private long max;
 
-	public long getId() {
+	public long getTowerId() {
 		return towerID;
 	}
 
-	public void setId(long id) {
-		this.roomID = id;
+	public void setTowerId(long id) {
+		this.towerID = id;
 	}
 
 	public long getMax() {
@@ -30,11 +30,11 @@ public class DBCelltowerEntry {
 		this.max = str;
 	}
 
-	public long getRoom() {
+	public long getRoomId() {
 		return roomID;
 	}
 
-	public void setRoom(long roomId) {
+	public void setRoomId(long roomId) {
 		this.roomID = roomId;
 	}
 }

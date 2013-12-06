@@ -365,8 +365,8 @@ public class DBOperator { // Handles normal usage of the database
 		// this order might be
 		// WRONG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		DBCelltowerEntry tower = new DBCelltowerEntry();
-		tower.setId(cursor.getLong(0));
-		tower.setRoom(cursor.getLong(1));
+		tower.setTowerId(cursor.getLong(0));
+		tower.setRoomId(cursor.getLong(1));
 		tower.setMin(cursor.getLong(2));
 		tower.setMax(cursor.getLong(3));
 
@@ -472,8 +472,8 @@ public class DBOperator { // Handles normal usage of the database
 		DBWifiInRoomEntry wifi = new DBWifiInRoomEntry();
 		wifi.setId(cursor.getString(0));
 		wifi.setRoom(cursor.getLong(1));
-		wifi.setMin(cursor.getLong(2));
-		wifi.setMax(cursor.getLong(3));
+		wifi.setMax(cursor.getLong(2));
+		wifi.setMin(cursor.getLong(3));
 
 		return wifi;
 	}
@@ -488,7 +488,7 @@ public class DBOperator { // Handles normal usage of the database
 		for (DBCelltowerEntry item1 : list1) {
 			exists = false;
 			for (DBCelltowerEntry item2 : list2) {
-				if (item1.getId() == item2.getId()) {
+				if (item1.getTowerId() == item2.getTowerId()) {
 					exists = true;
 				}
 			}
