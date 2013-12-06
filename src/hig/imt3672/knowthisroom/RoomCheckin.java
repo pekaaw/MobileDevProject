@@ -184,6 +184,9 @@ public class RoomCheckin {
 							if (dbWifiMin <= myWifiLevel
 									&& myWifiLevel <= dbWifiMax ) {
 								valid++;
+								
+								// We found a wifi from DB in this place, don't look for more
+								k = Wifis.size();
 								continue;
 							}
 							
@@ -192,6 +195,7 @@ public class RoomCheckin {
 							differenceMin[j] = (int) (dbWifiMin - myWifiLevel);
 							differenceMax[j] = (int) (dbWifiMax - myWifiLevel);
 
+							// We found a wifi from DB in this place, don't look for more
 							k = Wifis.size();
 						}
 					}
