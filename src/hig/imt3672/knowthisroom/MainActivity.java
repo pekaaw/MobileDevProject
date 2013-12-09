@@ -6,6 +6,8 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Handler.Callback;
+import android.os.Message;
 import android.os.ResultReceiver;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -24,6 +26,7 @@ public class MainActivity extends FragmentActivity implements
 		UpdateRoomDialog.Communicator {
 
 	static MainActivity m_instance;
+	public Handler setRoomHandler = null;
 
 	List<DBRoomEntry> list_of_rooms;
 	ArrayAdapter<DBRoomEntry> adapter_room_list;
@@ -48,6 +51,9 @@ public class MainActivity extends FragmentActivity implements
 		adapter_room_list = new ArrayAdapter<DBRoomEntry>(this,
 				android.R.layout.simple_list_item_1, list_of_rooms);
 
+		// set up a callback. It will bring the roomname from Service to activity 
+		setRoomHandler = new Handler( getRoomCallback );
+
 		// We create a GsmService intent and start it here:
 		final GSMResultReceiver resultReceiver = new GSMResultReceiver(null);
 		final Intent i = new Intent(this, ServiceHandler.class);
@@ -55,9 +61,6 @@ public class MainActivity extends FragmentActivity implements
 		i.putExtra("receiver", resultReceiver);
 		startService(i);
 		WifiSensor.createInstance(this);
-		// GplusHandler mPlus = new GplusHandler();
-		// mPlus.init();
-		// mPlus.postRoom("Jakob");
 	}
 
 	@Override
@@ -235,6 +238,20 @@ public class MainActivity extends FragmentActivity implements
 				room, listID);
 		detailsRoomDialog.show(manager, "detailed_room_dialog_id");
 	}
+
+	Callback getRoomCallback = new Callback() {
+
+		@Override
+		public boolean handleMessage(Message msg) {
+
+			Bundle bundle = msg.getData();
+			String roomName = bundle.getString( "roomName" );
+			setFoundRoomToName( roomName );
+
+			return false;
+		}
+
+	};
 
 	/**
 	 * onAddRoomNameRecieved(String name)

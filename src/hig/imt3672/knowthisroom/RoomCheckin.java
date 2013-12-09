@@ -1,5 +1,7 @@
 package hig.imt3672.knowthisroom;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import android.content.Context;
@@ -18,11 +20,13 @@ public class RoomCheckin {
 	CellTowerData Tower;
 	WifiSensor WifiManager;
 	List<ScanResult> Wifis;
+	
+	double SIGNAL_UPPER_MARGIN = 5.0;
+	double SIGNAL_LOWER_MARGIN = 5.0;
 
-	double level_margin;
-	double room_margin;
-	int[] differenceMin;
-	int[] differenceMax;
+	double local_upper_margin;
+	double local_lower_margin;
+	double room_margin = 0.35;
 	DBOperator Db;
 
 	List<DBCelltowerEntry> Celltowers;
@@ -60,9 +64,6 @@ public class RoomCheckin {
 		mContext = context.getApplicationContext();
 		WifiManager = WifiSensor.getInstance();
 		Db = DBOperator.getInstance();
-
-		level_margin = 2.0;
-		room_margin = 0.2;
 	}
 
 	//Filters out rooms based on celltower data
@@ -134,8 +135,13 @@ public class RoomCheckin {
 		Long dbWifiMin;
 		Integer myWifiLevel;
 		
+		local_upper_margin = SIGNAL_UPPER_MARGIN;
+		local_lower_margin = SIGNAL_UPPER_MARGIN;
+		
 		int valid = 0;
 		Wifis = WifiManager.GetNetworks();
+		List<ScanResult> presentWifiList = new ArrayList<ScanResult>();
+		presentWifiList.addAll(Wifis);
 
 		//If no rooms exist at all we'll just return
 		if(RoomEntries.size() < 1) {
@@ -153,75 +159,50 @@ public class RoomCheckin {
 				long roomId = RoomEntries.get(i).getId();
 				DBWifis = Db.getWifi(roomId);
 
-				differenceMin = new int[DBWifis.size()];
-				differenceMax = new int[DBWifis.size()];
-				
-				// We set the default value to an arbitrary value that it
-				// can never be naturally.
-				for (int j = 0; j < DBWifis.size(); j++) {
-					differenceMin[j] = Invalid;
-					differenceMax[j] = Invalid;
-				}
-
+				// Find valid wifi's that fits the data in db
 				//And we can begin to compare wifis... We first test to see 
 				//if it's between "minimum" and "maximum" values
 				for (int j = 0; j < DBWifis.size(); j++) {
-					for (int k = 0; k < Wifis.size(); k++) {
+					for (int k = 0; k < presentWifiList.size(); k++) {
 						
 						// Get BSSID's to compare
 						dbBSSID = DBWifis.get(j).getId();
-						myBSSID = Wifis.get(k).BSSID;
+						myBSSID = presentWifiList.get(k).BSSID;
 						
 						if ( dbBSSID.equals( myBSSID ) ) {
 
 							// Get different signal strengths
 							dbWifiMin = DBWifis.get(j).getMin();
 							dbWifiMax = DBWifis.get(j).getMax();
-							myWifiLevel = Wifis.get(k).level;
+							myWifiLevel = presentWifiList.get(k).level;
 
 							//If the wifi is valid its value remains "Invalid" internally
 							//so we don't check it again later, thus it cannot add "valid++" twice.
-							if (dbWifiMin <= myWifiLevel
-									&& myWifiLevel <= dbWifiMax ) {
+
+							Boolean withinUpperLimit = myWifiLevel >= dbWifiMin - local_lower_margin;
+							Boolean withinLowerLimit = myWifiLevel <= dbWifiMax + local_upper_margin;
+
+							if ( withinUpperLimit && withinLowerLimit ) {
 								valid++;
 								
 								// We found a wifi from DB in this place, don't look for more
-								k = Wifis.size();
+								k = presentWifiList.size();
 								continue;
 							}
 							
-							//If it did not pass the previous if statement we set the value
-							//to something other than "Invalid"
-							differenceMin[j] = (int) (dbWifiMin - myWifiLevel);
-							differenceMax[j] = (int) (dbWifiMax - myWifiLevel);
-
 							// We found a wifi from DB in this place, don't look for more
-							k = Wifis.size();
-						}
-					}
-				}
+							k = presentWifiList.size();
 
-				//Looping through the room's list of wifis again, this time testing the
-				//difference to see if it's within reasonable "extreme" limits.
-				for (int j = 0; j < DBWifis.size(); j++) {
-					if (differenceMin[j] == Invalid) {
-						continue;
-					}
-					
-					//Add to our "correct" hits if within margins
-					if (differenceMin[j] < level_margin
-							|| differenceMax[j] < level_margin
-							|| differenceMin[j] > level_margin * -1
-							|| differenceMax[j] > level_margin * -1) {
-						valid++;
-						continue;
-					}
-				}
+						} // end if equal BSSID
+					} // end for presentWifis
+				} // end for dbWifis
 
-				//Since our loop removes the elements we loop through
-				//we don't want to loop to "next" loop if a room has been removed
+				//Since our loop removes the elements we loop through,
+				//we don't want to jump to "next" loop if a room has been removed
 				//as we have moved the "next" to the position of the "current"
-				if (valid / DBWifis.size() > (1 - room_margin)) {
+				float prosentageValid = (float) valid / (float) DBWifis.size();
+				float prosentageValidLimit = 1 - (float) room_margin;
+				if ( prosentageValid > prosentageValidLimit ) {
 					i++;
 				} else {
 					RoomEntries.remove(i);
@@ -230,8 +211,9 @@ public class RoomCheckin {
 
 			//If we have more than one room we raise the bar of accepted margin
 			if (RoomEntries.size() > 1) {
-				level_margin = level_margin / 2;
-				room_margin = room_margin / 2;
+				local_upper_margin = local_upper_margin * 0.9;
+				local_lower_margin = local_lower_margin * 0.9;
+				room_margin = room_margin * 0.99;
 			}
 		} while(RoomEntries.size() > 1);
 		
@@ -243,9 +225,6 @@ public class RoomCheckin {
 		//Test that the found room is a different room.
 		if(RoomEntries.get(0) != mRegisteredRoom) {
 			mRegisteredRoom = RoomEntries.get(0);
-			Toast declareRoom = Toast.makeText
-					(mContext, mRegisteredRoom.getName(), Toast.LENGTH_LONG);
-			declareRoom.show();
 		}
 		
 		return mRegisteredRoom;

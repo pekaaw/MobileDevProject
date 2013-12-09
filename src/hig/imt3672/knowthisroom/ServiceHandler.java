@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Message;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -248,14 +249,27 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 			// find room we're in
 			DBRoomEntry room = roomFinder.GetRoom( roomFinder.GetRooms() );
 			
+			if( room == null ) {
+				Log.d("#FindThisRoomAction#", "setFoundRoomToName: null" );
+				return;
+			}
+
 			// Try to push it to MainActivity for display, or log exception
+			Message msg = new Message();
+			Bundle bundle = new Bundle();
+
+			bundle.putString("roomName", room.getName() );
+			msg.setData( bundle );
+
+			MainActivity.getInstance().setRoomHandler.sendMessage(msg);
+
 			try {
-				MainActivity.getInstance().setFoundRoomToName( room.getName() );
+				//MainActivity.getInstance().setFoundRoomToName( room.getName() );
 			}
 			catch( NullPointerException e ) {
 				Log.d("#FindThisRoomAction#", "setFoundRoomToName: " + e.getMessage() );
 			}
-			
+
 			Log.d("#FindThisRoomAction#", "I'm running!");
 		}
 	}
