@@ -16,15 +16,22 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.R.string;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.plus.PlusClient;
 
 public class JsonPoster {
 	private String jsonPage;
+	private Context context;
+	SharedPreferences prefs;
 
-	public JsonPoster() {
-		// TODO Auto-generated constructor stub
+	public JsonPoster(Context context) {
+		this.context = context;
+		prefs = PreferenceManager.getDefaultSharedPreferences(context);
 	}
 
 	public String getJsonPage() {
@@ -35,7 +42,8 @@ public class JsonPoster {
 		this.jsonPage = jsonPage;
 	}
 
-	public void postToPage(PlusClient client, string room, List<String> BSSID) {
+	public void postToPage(PlusClient client, String room, List<String> BSSID) {
+		jsonPage = prefs.getString("text_weblink", "");
 		// If there is no webpage set, we return
 		if (jsonPage.isEmpty())
 			return;
@@ -70,21 +78,21 @@ public class JsonPoster {
 			// Execute the post and get a response
 			HttpResponse response = httpClient.execute(httpPostRequest);
 			HttpEntity httpEntity = response.getEntity();
+			Toast.makeText(context, httpEntity.toString(), Toast.LENGTH_LONG)
+					.show();
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
+			Log.e("Json", "Error in creating Json object");
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
+			Log.e("URI", "Error in creating URI");
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
+			Log.e("ClientProtocol", "Someplace network");
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
