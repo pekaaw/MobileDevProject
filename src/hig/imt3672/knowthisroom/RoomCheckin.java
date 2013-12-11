@@ -20,9 +20,11 @@ public class RoomCheckin {
 	List<ScanResult> Wifis;
 
 	Integer MAX_ALGORITHM_ENQUIRIES = 15;
-
-	double SIGNAL_UPPER_MARGIN = 5.0;
-	double SIGNAL_LOWER_MARGIN = 5.0;
+	
+	static double CELL_UPPER_MARGIN = 1;
+	static double CELL_LOWER_MARGIN = 1;
+	static double SIGNAL_UPPER_MARGIN = 10;
+	static double SIGNAL_LOWER_MARGIN = 10;
 
 	double local_upper_margin;
 	double local_lower_margin;
@@ -33,8 +35,8 @@ public class RoomCheckin {
 	List<DBWifiInRoomEntry> DBWifis;
 
 	long roomTowerId;
-	long roomTowerMin;
-	long roomTowerMax;
+	long roomTowerWeakest;
+	long roomTowerStrongest;
 
 	// Singleton get instance
 	public static RoomCheckin getInstance() {
@@ -73,30 +75,38 @@ public class RoomCheckin {
 		Bundle Towerinfo = Tower.getCellTowerBundle();
 		Integer towerId = Towerinfo.getInt("CellID");
 		Integer towerStrength = Towerinfo.getInt("Strength");
-		Integer towerNoise = Towerinfo.getInt("cellNoise");
-
-		Log.d("Checkin", "Tower is " + Integer.toString(towerId)
-				+ " with strength " + Integer.toString(towerStrength) + ", "
-				+ Integer.toString(towerNoise) + " noise.");
-
+		
+		Log.d("Checkin","Tower is " + Integer.toString( towerId ) 
+				+ " with strength " + Integer.toString( towerStrength )
+						+ "." );
+		
 		List<DBRoomEntry> Rooms = Db.getAllDBRoomEntries();
 		int i = 0;
 
 		if (Rooms.size() < 1) {
 			return null;
 		}
+		
+		Log.d("#GetRooms#", " ");
 
 		while (i < Rooms.size()) {
+			Boolean found = false;
+			int a = 0;
 			long roomId = Rooms.get(i).getId();
 			Celltowers = Db.getCellTowers(roomId);
+			for(int c = 0; c < Celltowers.size(); c++ ) {
+				Log.d("#GetRooms#", Rooms.get(i).getName() + ":  " + Long.toString( Celltowers.get(c).getTowerId() ) );
+			}
 
 			for (int j = 0; j < Celltowers.size(); j++) {
 				roomTowerId = Celltowers.get(j).getTowerId();
-				roomTowerMin = Celltowers.get(j).getMin();
-				roomTowerMax = Celltowers.get(j).getMax();
-				if (towerId == roomTowerId
-						&& (towerStrength + towerNoise) >= roomTowerMax
-						&& (towerStrength - towerNoise) <= roomTowerMin) {
+				roomTowerWeakest = Celltowers.get(j).getMin();
+				roomTowerStrongest = Celltowers.get(j).getMax();
+				if (towerId == roomTowerId 
+						// in this test, lower values is strongest
+						&& towerStrength >= roomTowerStrongest-CELL_UPPER_MARGIN
+						&& towerStrength <= roomTowerWeakest+CELL_LOWER_MARGIN ) {
+					found = true;
 					break;
 				}
 			}
@@ -108,9 +118,7 @@ public class RoomCheckin {
 			// By removing like this we will at the end only have left
 			// the rooms that had matching celltowers in range.
 			// !!NOTE!! lower number means stronger signal !!NOTE!!
-			if (towerId == roomTowerId
-					&& (towerStrength + towerNoise) >= roomTowerMax
-					&& (towerStrength - towerNoise) <= roomTowerMin) {
+			if ( found ) {
 				i++;
 			} else {
 				Rooms.remove(i);
@@ -128,8 +136,13 @@ public class RoomCheckin {
 			// return new DBRoomEntry();
 		}
 
-		Log.d("#GetRoom#", "Rooms found: " + RoomEntries.size());
-
+		Log.d("#GetRoom#", " ");
+		Log.d("#GetRoom#","Rooms found: " + RoomEntries.size() );
+		for( int c = 0; c < RoomEntries.size(); c++ )
+		{
+			Log.d("#GetRoom#", RoomEntries.get(c).getName() );
+		}
+		
 		String dbBSSID;
 		String myBSSID;
 		Long dbWifiMax;
@@ -233,12 +246,13 @@ public class RoomCheckin {
 			if (RoomEntries.size() > 1) {
 				local_upper_margin = local_upper_margin * 0.9;
 				local_lower_margin = local_lower_margin * 0.9;
-				room_margin = room_margin * 0.99;
+				room_margin = room_margin * 1.01;
 			}
 
 			// ensure that the algorithm don't run wild
 			if (algoritmEnquiryCounter >= MAX_ALGORITHM_ENQUIRIES) {
 				// the algorithm can't decide, exit function with null
+				Log.d("#RoomCheckin#", "Algorithm ran for too long.");
 				return null;
 			}
 			algoritmEnquiryCounter += 1;
