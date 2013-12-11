@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.plus.PlusClient;
 
@@ -45,9 +44,10 @@ public class JsonPoster {
 	public void postToPage(PlusClient client, String room, List<String> BSSID) {
 		jsonPage = prefs.getString("text_weblink", "");
 		// If there is no webpage set, we return
-		if (jsonPage.isEmpty())
+		if (jsonPage.isEmpty() || BSSID.isEmpty()) {
+			Log.d("PostToPage", "Jsonpage or BSSID is empty");
 			return;
-
+		}
 		try {
 			// URI for page
 			URI page = new URI(jsonPage);
@@ -78,8 +78,8 @@ public class JsonPoster {
 			// Execute the post and get a response
 			HttpResponse response = httpClient.execute(httpPostRequest);
 			HttpEntity httpEntity = response.getEntity();
-			Toast.makeText(context, httpEntity.toString(), Toast.LENGTH_LONG)
-					.show();
+
+			Log.i("Jayson is:", httpEntity.toString());
 
 		} catch (JSONException e) {
 			Log.e("Json", "Error in creating Json object");

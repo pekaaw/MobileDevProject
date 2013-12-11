@@ -397,46 +397,51 @@ public class DBOperator { // Handles normal usage of the database
 		return returnList;
 
 	}
-	
+
 	/**
-	 * Returns a list of strings with the BSID of each wifi network stored for a specific room.
+	 * Returns a list of strings with the BSID of each wifi network stored for a
+	 * specific room.
 	 * <p>
-	 * @param roomId Id of the room
-	 * @param numbersOfRooms How many wifi-bsID's to return
+	 * 
+	 * @param roomId
+	 *            Id of the room
+	 * @param numbersOfRooms
+	 *            How many wifi-bsID's to return
 	 * @return List<String> with BSID's as strings
 	 */
 	public List<String> getWifiBsIDs(long roomId, int numbersOfRooms) {
-		
+
 		// List to return - with name of BSID's
 		List<String> wifiNameList = new ArrayList<String>();
-		
+
 		// Specify statement and run query
-		String whereStatement = (ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID + "=" + roomId);
-		Cursor cursor = database.query( ExtendedSQLLiteHelper.WIFI_ROOM_TABLE, 
-										null, whereStatement, null, null, null, 
-										ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN + " DESC");
-		
+		String whereStatement = (ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID
+				+ "=" + roomId);
+		Cursor cursor = database.query(ExtendedSQLLiteHelper.WIFI_ROOM_TABLE,
+				null, whereStatement, null, null, null,
+				ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN + " DESC");
+
 		// go to start of cursor and initialize counter to 0
 		cursor.moveToFirst();
 		int counter = 0;
-		
+
 		// run through to we get to end
-		while( !cursor.isAfterLast() || (counter <= numbersOfRooms) ) {
-			
+		while (!cursor.isAfterLast() && (counter <= numbersOfRooms)) {
+
 			// find wifi and add the string of the BSID to the list
 			DBWifiInRoomEntry wifi = cursorToDBWifiInRoomEntry(cursor);
-			wifiNameList.add( wifi.getId() );
-			
+			wifiNameList.add(wifi.getId());
+
 			// then move on to next position in cursor and count up
 			cursor.moveToNext();
 			counter++;
 		}
-		
+
 		// close cursor
 		cursor.close();
-		
+
 		// wifiNameList should now be #numberOfRooms long
-		return wifiNameList;		
+		return wifiNameList;
 	}
 
 	public boolean wifiExists(long roomId, String BsID) {
