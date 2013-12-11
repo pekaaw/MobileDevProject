@@ -47,6 +47,7 @@ public class ServiceHandler extends Service implements ConnectionCallbacks,
 
 	// Wait 2 seconds to retrieve networks
 	static long TIME_TO_GET_NETWORKS = 2000;
+	Boolean m_protectSearch_running = false;
 
 	// Empty constructor
 	public ServiceHandler() {
@@ -250,8 +251,13 @@ public class ServiceHandler extends Service implements ConnectionCallbacks,
 		@Override
 		public void run() {
 			// ToDo: Fill with action, run algorithm and do stuff accordingly
+			if( m_protectSearch_running == true ) {
+				return;
+			}
+			m_protectSearch_running = true;
 			DBRoomEntry room = findRoom();
 			sendRoomToActivity(room);
+			m_protectSearch_running = false;
 		}
 	}
 

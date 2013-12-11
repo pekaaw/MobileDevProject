@@ -421,6 +421,11 @@ public class DBOperator { // Handles normal usage of the database
 				null, whereStatement, null, null, null,
 				ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN + " DESC");
 
+		// if we got nothing from the db, return the empty list.
+		if( cursor.getCount() == 0 ) {
+			return wifiNameList;
+		}
+		
 		// go to start of cursor and initialize counter to 0
 		cursor.moveToFirst();
 		int counter = 0;
