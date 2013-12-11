@@ -26,6 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@+id/found_wrong_room_btn"
+            android:layout_below="@id/found_room_title"
             android:layout_alignBottom="@id/found_wrong_room_btn"
             android:paddingRight="@dimen/activity_vertical_margin"
             android:textSize="@dimen/font_size"
@@ -45,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:contentDescription="@string/update_room_not_found"
-            android:src="@android:drawable/ic_menu_rotate" />"
+            android:src="@android:drawable/ic_menu_rotate" />
 
     </RelativeLayout>
     
