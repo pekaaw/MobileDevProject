@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements
+		View.OnClickListener,
 		AddRoomDialog.Communicator, DeleteRoomDialog.Communicator,
 		UpdateRoomDialog.Communicator {
 
@@ -50,6 +51,10 @@ public class MainActivity extends FragmentActivity implements
 		list_of_rooms = database.getAllDBRoomEntries();
 		adapter_room_list = new ArrayAdapter<DBRoomEntry>(this,
 				android.R.layout.simple_list_item_1, list_of_rooms);
+		
+		// Activate buttons in mainActivity
+		findViewById(R.id.found_wrong_room_btn).setOnClickListener( this );
+		findViewById(R.id.found_room_update_btn).setOnClickListener( this );
 
 		// set up a callback. It will bring the roomname from Service to activity 
 		setRoomHandler = new Handler( getRoomCallback );
@@ -302,6 +307,10 @@ public class MainActivity extends FragmentActivity implements
 	public void setFoundRoomToName( String nameOfRoom ) {
 		TextView displayedRoom = (TextView) findViewById( R.id.found_room_name );
 		
+		if( nameOfRoom == null ) {
+			nameOfRoom = getResources().getString(R.string.update_room_not_found);
+		}
+		
 		// try to set text ( expects NullPointerException if string is null )
 		try{
 			displayedRoom.setText( nameOfRoom );
@@ -383,6 +392,23 @@ public class MainActivity extends FragmentActivity implements
 		public void gplus_connect();
 
 		public void gplus_disconnect();
+	}
+
+	@Override
+	public void onClick(View v) {
+
+		switch( v.getId() ) {
+		case R.id.found_wrong_room_btn:
+			break;
+		case R.id.found_room_update_btn:
+			ServiceHandler.getInstance().sendRoomToActivity(
+					ServiceHandler.getInstance().findRoom()
+				);
+			break;
+		default:
+			break;
+		}
+		
 	}
 
 }

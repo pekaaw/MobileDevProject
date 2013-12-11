@@ -21,6 +21,8 @@ public class RoomCheckin {
 	WifiSensor WifiManager;
 	List<ScanResult> Wifis;
 	
+	Integer MAX_ALGORITHM_ENQUIRIES = 15;
+	
 	double SIGNAL_UPPER_MARGIN = 5.0;
 	double SIGNAL_LOWER_MARGIN = 5.0;
 
@@ -129,12 +131,15 @@ public class RoomCheckin {
 			//return new DBRoomEntry();
 		}
 		
+		Log.d("#GetRoom#","Rooms found: " + RoomEntries.size() );
+		
 		String dbBSSID;
 		String myBSSID;
 		Long dbWifiMax;
 		Long dbWifiMin;
 		Integer myWifiLevel;
-		
+		Integer algoritmEnquiryCounter = 0;
+				
 		local_upper_margin = SIGNAL_UPPER_MARGIN;
 		local_lower_margin = SIGNAL_UPPER_MARGIN;
 		
@@ -215,6 +220,14 @@ public class RoomCheckin {
 				local_lower_margin = local_lower_margin * 0.9;
 				room_margin = room_margin * 0.99;
 			}
+			
+			// ensure that the algorithm don't run wild
+			if( algoritmEnquiryCounter >= MAX_ALGORITHM_ENQUIRIES ) {
+				// the algorithm can't decide, exit function with null
+				return null;
+			}
+			algoritmEnquiryCounter += 1;
+			
 		} while(RoomEntries.size() > 1);
 		
 		//If we have no hits we're done here.

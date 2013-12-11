@@ -13,6 +13,7 @@ import android.os.Message;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
@@ -237,41 +238,46 @@ public class ServiceHandler extends Service implements ConnectionCallbacks, OnCo
 	 * @author Pekaaw
 	 *
 	 */
-	class FindThisRoomAction extends TimerTask {
+	public class FindThisRoomAction extends TimerTask {
 		
 		@Override
 		public void run() {
 			// ToDo: Fill with action, run algorithm and do stuff accordingly
-			
-			// Get roomFinder
-			RoomCheckin roomFinder = RoomCheckin.getInstance();
-			
-			// find room we're in
-			DBRoomEntry room = roomFinder.GetRoom( roomFinder.GetRooms() );
-			
-			if( room == null ) {
-				Log.d("#FindThisRoomAction#", "setFoundRoomToName: null" );
-				return;
-			}
-
-			// Try to push it to MainActivity for display, or log exception
-			Message msg = new Message();
-			Bundle bundle = new Bundle();
-
-			bundle.putString("roomName", room.getName() );
-			msg.setData( bundle );
-
-			MainActivity.getInstance().setRoomHandler.sendMessage(msg);
-
-			try {
-				//MainActivity.getInstance().setFoundRoomToName( room.getName() );
-			}
-			catch( NullPointerException e ) {
-				Log.d("#FindThisRoomAction#", "setFoundRoomToName: " + e.getMessage() );
-			}
-
-			Log.d("#FindThisRoomAction#", "I'm running!");
+			DBRoomEntry room = findRoom(); 
+			sendRoomToActivity( room );
 		}
+	}
+	
+	DBRoomEntry findRoom() {
+		// Get roomFinder
+		RoomCheckin roomFinder = RoomCheckin.getInstance();
+		
+		// find room we're in
+		DBRoomEntry room = roomFinder.GetRoom( roomFinder.GetRooms() );
+		
+		if( room == null ) {
+			// create a "I don't know"-room
+			room = new DBRoomEntry();
+			room.setId( 0 );
+			room.setName( getString( R.string.update_room_not_found) );
+		}
+		
+		Log.d("#FindThisRoomAction#", room.getName() );
+	
+		return room;
+	}
+	
+	void sendRoomToActivity( DBRoomEntry room ) {
+		
+		// Put name to bundle and attach bundle to message
+		Message msg = new Message();
+		Bundle bundle = new Bundle();
+		bundle.putString("roomName", room.getName() );
+		msg.setData( bundle );
+
+		// Send the message to a handler in the activity
+		MainActivity.getInstance().setRoomHandler.sendMessage(msg);
+
 	}
 
 }
