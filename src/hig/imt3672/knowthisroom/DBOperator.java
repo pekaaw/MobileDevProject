@@ -285,20 +285,30 @@ public class DBOperator { // Handles normal usage of the database
 		List<DBRoomEntry> rooms = new ArrayList<DBRoomEntry>();
 		open();
 
-		Cursor cursor = database.query(ExtendedSQLLiteHelper.ROOM_TABLE,
-				allRooms, null, null, null, null,
-				ExtendedSQLLiteHelper.ROOM_COLUMN_NAME + " COLLATE NOCASE");// +
-																			// " ASC");
+		try {
+		
+			Cursor cursor = database.query(ExtendedSQLLiteHelper.ROOM_TABLE,
+					allRooms, null, null, null, null,
+					ExtendedSQLLiteHelper.ROOM_COLUMN_NAME + " COLLATE NOCASE");// +
+																				// " ASC");
+	
+			cursor.moveToFirst();
+			while (!cursor.isAfterLast()) {
+				DBRoomEntry room = cursorToDBRoomEntry(cursor);
+				rooms.add(room);
+				cursor.moveToNext();
+			}
+			
+			// Make sure to close the cursor
+			cursor.close();
+			
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} 
 
-		cursor.moveToFirst();
-		while (!cursor.isAfterLast()) {
-			DBRoomEntry room = cursorToDBRoomEntry(cursor);
-			rooms.add(room);
-			cursor.moveToNext();
-		}
-		// Make sure to close the cursor
-		cursor.close();
+		// close db
 		close();
+
 		return rooms;
 	}
 
