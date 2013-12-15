@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">この部屋を知っている</string>
+    <string name="gplus_connect">G+に接続する</string>
+    <string name="gplus_disconnect">G+から切断</string>
+    <string name="add_room">部屋を追加</string>
+    <string name="delete_room">部屋を削除</string>
+    <string name="update_room">私はここです:</string>
+    <string name="update_room_not_found">"まだ分かりません&#8230;"</string>
+    <string name="update_room_wrong_btn">部屋間違ったですか?</string>
+    <string name="add_room_instruction">部屋の名前:</string>
+    <string name="delete_room_headline">本当に部屋を削除?</string>
+    <string name="update_room_headline">あなたは本当に検閲ルームで現在のデータで、これを更新しますか?</string>
+    <string name="detailed_room_headline">"部屋の詳細, "</string>
+    <string name="detailed_tower_header">セルタワー情報:</string>
+    <string name="detailed_wifi_header">WIFI情報:</string>
+    
+    <string name="details_room_visible_networks">目に見えるネットワーク</string>
+    <string name="details_room_bsid">BSID</string>
+    <string name="details_room_strength">信号強度</string>
+    
+    <string name="dummytext">これはただのようなものです!</string>
+    
+    <!-- Settings -->
+    <string name="action_settings">設定</string>
+    <string name="settings_category_posting">ウェブに投稿</string>
+    <string name="settings_post_to_weblink">自身の選択のサーバ</string>
+    <string name="settings_server_weblink">受信サーバを指定する</string>
+    <string name="settings_post_to_gplus_moments">G+ 瞬間</string>
+    <string name="settings_post_to_gplus_stream">G+ ストリーム</string>
+    
+    <string name="eating_potato">ジャガイモを食べる</string>
+    <string name="thinking_up_stupid_names">"愚かな名前を考えてい"</string>
+    <string name="cleaning_tea_cup">"茶碗を清掃"</string>
+    <string name="Implementing_NSA">"NSAバックドアを実装する!"</string>
+    <string name="scraping_of_dog">"あなたのノミを取り除く."</string>
+    <string name="teaching_jonas">"サックスにジョナスを教える."</string>
+    <string name="broadcasting_pos">"Googleで自分の位置を放送</string>
+    
+    <string-array name="gplus_logon">
+        <item>@string/eating_potato</item>
+        <item>@string/thinking_up_stupid_names</item>
+        <item>@string/cleaning_tea_cup</item>
+        <item>@string/Implementing_NSA</item>
+        <item>@string/scraping_of_dog</item>
+        <item>@string/teaching_jonas</item>
+        <item>@string/broadcasting_pos</item>
+    </string-array>
+    
+</resources>
