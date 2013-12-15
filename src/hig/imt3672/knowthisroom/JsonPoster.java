@@ -77,10 +77,9 @@ public class JsonPoster {
 					JSONObject jayson = new JSONObject();
 					
 					// Get the current time
-					Calendar time = Calendar.getInstance();
-					//SimpleDateFormat dateFormat = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss a");
-					DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance();
-					String date = dateFormat.format( time.getTime() );
+					Calendar 	time = Calendar.getInstance();
+					DateFormat 	dateFormat = SimpleDateFormat.getDateTimeInstance();
+					String 		date = dateFormat.format( time.getTime() );
 					
 					// Fill the Json with data
 					jayson.put("room", room);
@@ -100,7 +99,9 @@ public class JsonPoster {
 					
 					// The data to post
 					String jsonString = jayson.toString(4);
-				
+					Log.d("#JsonPoster#POST", jsonString);
+					Log.d("#JsonPoster#POSTto", jsonPage );
+					
 					try {
 						// Instantiate a new client
 						HttpClient webClient = new DefaultHttpClient();
@@ -122,15 +123,18 @@ public class JsonPoster {
 						// Execute the call
 						HttpResponse responsePOST = webClient.execute(post);
 						
-						// Get the respons
+						// Get the response
 						HttpEntity resEntity = responsePOST.getEntity();
 						
 						// If we got a response, log this
 						if (resEntity != null) {    
-						    Log.i("RESPONSE",EntityUtils.toString(resEntity));
+						    Log.i("#JsonPoster#webResponse",EntityUtils.toString(resEntity));
 						}
 					
 					// catch exceptions
+				    } catch ( NullPointerException e ) {
+				    	Log.d("#JsonPoster#", e.toString() );
+				    	e.printStackTrace();
 				    } catch (Exception e) {
 				        e.printStackTrace();
 				    }
