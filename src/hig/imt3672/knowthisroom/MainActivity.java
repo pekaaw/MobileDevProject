@@ -400,6 +400,9 @@ public class MainActivity extends FragmentActivity implements
 
 		switch( v.getId() ) {
 		case R.id.found_wrong_room_btn:
+			// start correct room activity
+			Intent intent = new Intent(this, CorrectRoomActivity.class);
+			startActivity(intent);
 			break;
 		case R.id.found_room_update_btn:
 			ServiceHandler.getInstance().sendRoomToActivity(

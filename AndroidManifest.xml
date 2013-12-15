@@ -44,6 +44,11 @@
 			android:label="@string/action_settings" 
             android:parentActivityName="hig.imt3672.knowthisroom.MainActivity"  >
         </activity>
-	</application>
+        <activity
+            android:name="hig.imt3672.knowthisroom.CorrectRoomActivity"
+			android:label="@string/update_room" 
+            android:parentActivityName="hig.imt3672.knowthisroom.MainActivity"  >
+        </activity>
+        	</application>
 
 </manifest>
