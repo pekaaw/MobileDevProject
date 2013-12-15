@@ -20,7 +20,7 @@ public class RoomCheckin {
 	List<ScanResult> Wifis;
 
 	Integer MAX_ALGORITHM_ENQUIRIES = 15;
-	
+
 	static double CELL_UPPER_MARGIN = 1;
 	static double CELL_LOWER_MARGIN = 1;
 	static double SIGNAL_UPPER_MARGIN = 10;
@@ -41,7 +41,7 @@ public class RoomCheckin {
 	long roomTowerStrongest;
 
 	// Singleton get instance
-	public static RoomCheckin getInstance() {
+	public synchronized static RoomCheckin getInstance() {
 		if (mInstance == null) {
 			Log.d("RoomCheckin", "You have not created an instance.");
 			return null;
@@ -51,7 +51,7 @@ public class RoomCheckin {
 	}
 
 	// Since we require a context we create our instance separately
-	public static void createInstance(Context context) {
+	public synchronized static void createInstance(Context context) {
 		if (mInstance != null) {
 			Log.d("RoomCheckin", "An instance already exists.");
 			return;
@@ -73,22 +73,21 @@ public class RoomCheckin {
 
 	// Filters out rooms based on celltower data
 	public List<DBRoomEntry> GetRooms() {
-		
-		if( find_room_locked ) {
+
+		if (find_room_locked) {
 			return null;
 		}
-		
+
 		find_room_locked = true;
-		
+
 		Tower = ServiceHandler.getInstance().m_CellTowerHander.mCellTowerData;
 		Bundle Towerinfo = Tower.getCellTowerBundle();
 		Integer towerId = Towerinfo.getInt("CellID");
 		Integer towerStrength = Towerinfo.getInt("Strength");
-		
-		Log.d("Checkin","Tower is " + Integer.toString( towerId ) 
-				+ " with strength " + Integer.toString( towerStrength )
-						+ "." );
-		
+
+		Log.d("Checkin", "Tower is " + Integer.toString(towerId)
+				+ " with strength " + Integer.toString(towerStrength) + ".");
+
 		List<DBRoomEntry> Rooms = Db.getAllDBRoomEntries();
 		int i = 0;
 
@@ -96,7 +95,7 @@ public class RoomCheckin {
 			find_room_locked = false;
 			return null;
 		}
-		
+
 		Log.d("#GetRooms#", " ");
 
 		while (i < Rooms.size()) {
@@ -104,18 +103,22 @@ public class RoomCheckin {
 			int a = 0;
 			long roomId = Rooms.get(i).getId();
 			Celltowers = Db.getCellTowers(roomId);
-			for(int c = 0; c < Celltowers.size(); c++ ) {
-				Log.d("#GetRooms#", Rooms.get(i).getName() + ":  " + Long.toString( Celltowers.get(c).getTowerId() ) );
+			for (int c = 0; c < Celltowers.size(); c++) {
+				Log.d("#GetRooms#",
+						Rooms.get(i).getName() + ":  "
+								+ Long.toString(Celltowers.get(c).getTowerId()));
 			}
 
 			for (int j = 0; j < Celltowers.size(); j++) {
 				roomTowerId = Celltowers.get(j).getTowerId();
 				roomTowerWeakest = Celltowers.get(j).getMin();
 				roomTowerStrongest = Celltowers.get(j).getMax();
-				if (towerId == roomTowerId 
+				if (towerId == roomTowerId
 						// in this test, lower values is strongest
-						&& towerStrength >= roomTowerStrongest-CELL_UPPER_MARGIN
-						&& towerStrength <= roomTowerWeakest+CELL_LOWER_MARGIN ) {
+						&& towerStrength >= roomTowerStrongest
+								- CELL_UPPER_MARGIN
+						&& towerStrength <= roomTowerWeakest
+								+ CELL_LOWER_MARGIN) {
 					found = true;
 					break;
 				}
@@ -128,7 +131,7 @@ public class RoomCheckin {
 			// By removing like this we will at the end only have left
 			// the rooms that had matching celltowers in range.
 			// !!NOTE!! lower number means stronger signal !!NOTE!!
-			if ( found ) {
+			if (found) {
 				i++;
 			} else {
 				Rooms.remove(i);
@@ -138,23 +141,22 @@ public class RoomCheckin {
 	}
 
 	// Filters out a list of rooms to leave it with 0 or 1 rooms
-	public DBRoomEntry GetRoom(List<DBRoomEntry> RoomEntries) {
+	public synchronized DBRoomEntry GetRoom(List<DBRoomEntry> RoomEntries) {
 
 		// If no rooms exist at all we'll just return
 		// If input it not valid, return an empty DBRoomEntry
-		if ( RoomEntries == null || RoomEntries.size() < 1 ) {
+		if (RoomEntries == null || RoomEntries.size() < 1) {
 			find_room_locked = false;
 			return null;
 			// return new DBRoomEntry();
 		}
 
 		Log.d("#GetRoom#", " ");
-		Log.d("#GetRoom#","Rooms found: " + RoomEntries.size() );
-		for( int c = 0; c < RoomEntries.size(); c++ )
-		{
-			Log.d("#GetRoom#", RoomEntries.get(c).getName() );
+		Log.d("#GetRoom#", "Rooms found: " + RoomEntries.size());
+		for (int c = 0; c < RoomEntries.size(); c++) {
+			Log.d("#GetRoom#", RoomEntries.get(c).getName());
 		}
-		
+
 		String dbBSSID;
 		String myBSSID;
 		Long dbWifiMax;
@@ -171,13 +173,13 @@ public class RoomCheckin {
 		} catch (Exception e) {
 			Log.d("WIfiManager", "Trouble getting Networks man!");
 		}
-		
+
 		if (Wifis == null) {
 			Log.d("No wifis", "There is noo wifis returned.");
 			find_room_locked = false;
 			return null;
 		}
-		
+
 		List<ScanResult> presentWifiList = new ArrayList<ScanResult>();
 		presentWifiList.addAll(Wifis);
 
@@ -242,10 +244,12 @@ public class RoomCheckin {
 				float prosentageValidLimit = 1 - (float) room_margin;
 				if (prosentageValid > prosentageValidLimit) {
 					i++;
-					Log.d("#RoomCheckin#", "Cellsignals fit that of the registered room.");
+					Log.d("#RoomCheckin#",
+							"Cellsignals fit that of the registered room.");
 				} else {
-					Log.d("#RoomCheckin#", RoomEntries.get(i).getName() + " is removed.");
-						RoomEntries.remove(i);
+					Log.d("#RoomCheckin#", RoomEntries.get(i).getName()
+							+ " is removed.");
+					RoomEntries.remove(i);
 				}
 			}
 
@@ -255,20 +259,25 @@ public class RoomCheckin {
 			room_margin = room_margin * 1.0001;
 
 			// ensure that the algorithm don't run wild
-//			if (algoritmEnquiryCounter >= MAX_ALGORITHM_ENQUIRIES) {
-//				// the algorithm can't decide, exit function with null
-//				Log.d("#RoomCheckin#", "Algorithm ran for too long.");
-//				return null;
-//			}
+			// if (algoritmEnquiryCounter >= MAX_ALGORITHM_ENQUIRIES) {
+			// // the algorithm can't decide, exit function with null
+			// Log.d("#RoomCheckin#", "Algorithm ran for too long.");
+			// return null;
+			// }
 			algoritmEnquiryCounter += 1;
-			Log.d("#RoomCheckin#", "Room_Margin: " + Double.toString(room_margin));
-			Log.d("#RoomCheckin#", "Rooms left: " + Integer.toString(RoomEntries.size()));
+			Log.d("#RoomCheckin#",
+					"Room_Margin: " + Double.toString(room_margin));
+			Log.d("#RoomCheckin#",
+					"Rooms left: " + Integer.toString(RoomEntries.size()));
 
 		} while (RoomEntries.size() > 1);
 
 		// If we have no hits we're done here.
 		if (RoomEntries.size() < 1) {
-			Log.d("#RoomCheckin#", "Algorithm run for " + Integer.toString(algoritmEnquiryCounter) + " times.");
+			Log.d("#RoomCheckin#",
+					"Algorithm run for "
+							+ Integer.toString(algoritmEnquiryCounter)
+							+ " times.");
 			Log.d("#RoomCheckin#", "Return null.");
 			Log.d("#RoomCheckin#", " ");
 			find_room_locked = false;
@@ -279,13 +288,15 @@ public class RoomCheckin {
 		if (RoomEntries.get(0) != mRegisteredRoom) {
 			mRegisteredRoom = RoomEntries.get(0);
 		}
-		
-		Log.d("#RoomCheckin#", "Algorithm run for " + Integer.toString(algoritmEnquiryCounter) + " times.");
-		Log.d("#RoomCheckin#", "Found room: " + mRegisteredRoom.getName() );
+
+		Log.d("#RoomCheckin#",
+				"Algorithm run for " + Integer.toString(algoritmEnquiryCounter)
+						+ " times.");
+		Log.d("#RoomCheckin#", "Found room: " + mRegisteredRoom.getName());
 		Log.d("#RoomCheckin#", " ");
-		
+
 		find_room_locked = false;
-		
+
 		return mRegisteredRoom;
 	}
 }

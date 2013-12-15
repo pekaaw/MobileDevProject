@@ -43,7 +43,7 @@ public class DBOperator { // Handles normal usage of the database
 		return mInstance;
 	}
 
-	public static void createInstance(Context context) {
+	public synchronized static void createInstance(Context context) {
 		if (mInstance != null) {
 			Log.d("DBOperator", "An instance already exists.");
 			return;
@@ -281,25 +281,8 @@ public class DBOperator { // Handles normal usage of the database
 		return rooms;
 	}
 
-	// :::::::::::::::Cursors::::::::::::::::::::::::::::
-	private long cursorToID(Cursor cursor) {
-		return cursor.getLong(0);
-	}
-
-	private long cursorToCellStr(Cursor cursor) {
-		return cursor.getLong(1);
-	}
-
-	private long cursorToWifiStr(Cursor cursor) {
-		return cursor.getLong(2);
-	}
-
 	private long cursorToLong(Cursor cursor) {
 		return cursor.getLong(0);
-	}
-
-	private String cursorToString(Cursor cursor) {
-		return cursor.getString(0);
 	}
 
 	// :::::::cursor for rooms::::::::::
@@ -422,10 +405,10 @@ public class DBOperator { // Handles normal usage of the database
 				ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN + " DESC");
 
 		// if we got nothing from the db, return the empty list.
-		if( cursor.getCount() == 0 ) {
+		if (cursor.getCount() == 0) {
 			return wifiNameList;
 		}
-		
+
 		// go to start of cursor and initialize counter to 0
 		cursor.moveToFirst();
 		int counter = 0;
@@ -486,30 +469,6 @@ public class DBOperator { // Handles normal usage of the database
 		wifi.setMin(cursor.getLong(3));
 
 		return wifi;
-	}
-
-	private List<DBCelltowerEntry> getDifferenceCell(
-			List<DBCelltowerEntry> list1, List<DBCelltowerEntry> list2) {
-		// must not be used without on entire set, only lists specific to ONE
-		// room
-		// list1 must be the one with the celltowers that should be added
-		List<DBCelltowerEntry> returnList = new ArrayList<DBCelltowerEntry>();
-		boolean exists;
-		for (DBCelltowerEntry item1 : list1) {
-			exists = false;
-			for (DBCelltowerEntry item2 : list2) {
-				if (item1.getTowerId() == item2.getTowerId()) {
-					exists = true;
-				}
-			}
-			if (exists == false) {
-				returnList.add(item1);
-
-			}
-
-		}
-
-		return returnList;
 	}
 
 	private List<DBWifiInRoomEntry> getDifferenceWifi(

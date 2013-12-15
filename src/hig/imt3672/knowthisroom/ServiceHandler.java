@@ -251,7 +251,7 @@ public class ServiceHandler extends Service implements ConnectionCallbacks,
 		@Override
 		public void run() {
 			// ToDo: Fill with action, run algorithm and do stuff accordingly
-			if( m_protectSearch_running == true ) {
+			if (m_protectSearch_running == true) {
 				return;
 			}
 			m_protectSearch_running = true;
@@ -261,7 +261,7 @@ public class ServiceHandler extends Service implements ConnectionCallbacks,
 		}
 	}
 
-	DBRoomEntry findRoom() {
+	synchronized DBRoomEntry findRoom() {
 		// Get roomFinder
 		RoomCheckin roomFinder = RoomCheckin.getInstance();
 

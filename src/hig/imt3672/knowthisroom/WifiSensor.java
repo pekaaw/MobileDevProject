@@ -27,81 +27,83 @@ import android.util.Log;
 
 public class WifiSensor {
 	static WifiSensor mInstance;
-	
+
 	Context mContext;
 	WifiManager wifi;
 	List<ScanResult> networks;
 	int size;
-	
+
 	public static WifiSensor getInstance() {
-		if(mInstance == null) {
-			Log.d("WifiSensor","You have not created an instance.");
+		if (mInstance == null) {
+			Log.d("WifiSensor", "You have not created an instance.");
 			return null;
 		}
-		Log.d("WifiSensor","Obtained instance.");
+		Log.d("WifiSensor", "Obtained instance.");
 		return mInstance;
 	}
-	
-	public static void createInstance(Context context) {
-		if(mInstance != null) {
-			Log.d("WifiSensor","An instance already exists.");
+
+	public synchronized static void createInstance(Context context) {
+		if (mInstance != null) {
+			Log.d("WifiSensor", "An instance already exists.");
 			return;
 		}
 		mInstance = new WifiSensor(context);
-		Log.d("WifiSensor","Created instance.");
+		Log.d("WifiSensor", "Created instance.");
 	}
-	
+
 	private WifiSensor(Context context) {
 		mContext = context.getApplicationContext();
 		wifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-		if(!wifi.isWifiEnabled()) {wifi.setWifiEnabled(true);}
+		if (!wifi.isWifiEnabled()) {
+			wifi.setWifiEnabled(true);
+		}
 		wifi.startScan();
-		
+
 		Log.d("WifiSensor", "Registering listener.");
 		mContext.registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context c, Intent intent) 
-            {
-        		Log.d("WifiSensor", "Networks found!");
-            	networks = wifi.getScanResults();
-            	size = networks.size();
-        		Log.d("WifiSensor", "Networks: " + Integer.toString(size));
-            }
-        }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+			@Override
+			public void onReceive(Context c, Intent intent) {
+				Log.d("WifiSensor", "Networks found!");
+				networks = wifi.getScanResults();
+				size = networks.size();
+				Log.d("WifiSensor", "Networks: " + Integer.toString(size));
+			}
+		}, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 	}
-	
+
 	/*
 	 * TIP: For info on ScanResult:
 	 * http://developer.android.com/reference/android/net/wifi/ScanResult.html
 	 */
 
 	public List<ScanResult> GetNetworks() {
-		if(mContext == null) {
+		if (mContext == null) {
 			Log.d("WifiSensor", "No context provided. Returning.");
 			return null;
 		}
-		
-		Log.d("WifiSensor","Networks: " + Integer.toString(size));
-		if(size != 0) {
+
+		Log.d("WifiSensor", "Networks: " + Integer.toString(size));
+		if (size != 0) {
 			// Sorts by the BSSID of the ScanResults.
 			Collections.sort(networks, new Comparator<ScanResult>() {
 				public int compare(ScanResult s1, ScanResult s2) {
 					return s1.BSSID.compareToIgnoreCase(s2.BSSID);
 				}
 			});
-	
+
 			Log.d("WifiSensor", "Sorted " + Integer.toString(networks.size())
 					+ " networks.");
 		}
 		return networks;
 	}
-	
+
 	public int GetSize() {
 		return size;
 	}
 
 	/**
 	 * Start wifi scan from outside this class
+	 * 
 	 * @author PK
 	 */
 	public void startScan() {
