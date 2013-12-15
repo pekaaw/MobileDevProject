@@ -43,7 +43,7 @@ public class ServiceHandler extends Service implements ConnectionCallbacks,
 	JsonPoster m_jsonPoster = null;
 
 	// run algorithm each 60 second
-	static long TIMER_LENGTH_MILLISECONDS = 60000;
+	static long TIMER_LENGTH_MILLISECONDS = 6000;
 
 	// Wait 2 seconds to retrieve networks
 	static long TIME_TO_GET_NETWORKS = 2000;
@@ -62,8 +62,9 @@ public class ServiceHandler extends Service implements ConnectionCallbacks,
 		// Initialize the google PlusClient
 		m_PlusClient = new PlusClient.Builder(this, this, this)
 				.setActions("http://schemas.google.com/CheckInActivity")
-				.setScopes(Scopes.PLUS_LOGIN).build();
-
+				.setScopes(Scopes.PLUS_LOGIN)
+				.build();
+		
 		m_GplusHandler = new GplusHandler();
 		m_jsonPoster = new JsonPoster(this);
 
@@ -213,7 +214,11 @@ public class ServiceHandler extends Service implements ConnectionCallbacks,
 	@Override
 	public void gplus_disconnect() {
 		Log.d("#Service#", "Try to disconnect.");
-		m_PlusClient.disconnect();
+		if( m_PlusClient.isConnected() ) {
+			m_PlusClient.clearDefaultAccount();
+			m_PlusClient.disconnect();
+			m_PlusClient.connect();
+		}
 	}
 
 	/**

@@ -1,8 +1,11 @@
 package hig.imt3672.knowthisroom;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.google.android.gms.plus.PlusClient;
+import com.google.android.gms.plus.PlusShare;
 import com.google.android.gms.plus.model.moments.ItemScope;
 import com.google.android.gms.plus.model.moments.Moment;
 
@@ -59,18 +62,36 @@ public class GplusHandler {
 		// Builds the item for the moment
 		ItemScope itemScope = new ItemScope.Builder()
 				.setId(roomName)
+				//.setType("http://schema.org/Place")
 				.setType("http://schema.org/Thing")
 				.setName(roomName)
 				.setDescription("I just went into room: " + roomName)
-				//.setText("I just went into room: " + roomName)
+				.setText("I just went into room: " + roomName)
 				.build();
 
 		// Builds a moment
 		Moment moment = new Moment.Builder()
 				.setType("http://schemas.google.com/CheckInActivity")
+				//.setType("http://schemas.google.com/AddActivity")
 				.setTarget(itemScope)
 				.build();
-		Log.d("Moment", moment.toString());
-		plusClient.writeMoment(moment);
+		Log.d("#GplusHandler#", moment.toString());
+		
+		if( plusClient.isConnected() ) {
+			plusClient.writeMoment(moment);
+		}
+		else {
+			Log.d("#GplusHandler#", "plusClient is not connected.");
+		}
+	}
+	
+	public void postRoomToGplusStream( Context context, String roomName, PlusClient plusClient ) {
+	
+		Intent shareToStream = new PlusShare.Builder(context)
+			.setType("text/plain")
+			.setText(roomName)
+			.getIntent();
+		
+		MainActivity.getInstance().startActivityForResult(shareToStream, 0);
 	}
 }

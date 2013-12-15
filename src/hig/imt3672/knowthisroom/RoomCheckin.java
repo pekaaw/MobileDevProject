@@ -89,6 +89,7 @@ public class RoomCheckin {
 				+ " with strength " + Integer.toString(towerStrength) + ".");
 
 		List<DBRoomEntry> Rooms = Db.getAllDBRoomEntries();
+
 		int i = 0;
 
 		if (Rooms.size() < 1) {
@@ -244,11 +245,10 @@ public class RoomCheckin {
 				float prosentageValidLimit = 1 - (float) room_margin;
 				if (prosentageValid > prosentageValidLimit) {
 					i++;
-					Log.d("#RoomCheckin#",
-							"Cellsignals fit that of the registered room.");
+
+//					Log.d("#RoomCheckin#", "Cellsignals fit that of the registered room.");
 				} else {
-					Log.d("#RoomCheckin#", RoomEntries.get(i).getName()
-							+ " is removed.");
+//					Log.d("#RoomCheckin#", RoomEntries.get(i).getName() + " is removed.");
 					RoomEntries.remove(i);
 				}
 			}
@@ -265,10 +265,8 @@ public class RoomCheckin {
 			// return null;
 			// }
 			algoritmEnquiryCounter += 1;
-			Log.d("#RoomCheckin#",
-					"Room_Margin: " + Double.toString(room_margin));
-			Log.d("#RoomCheckin#",
-					"Rooms left: " + Integer.toString(RoomEntries.size()));
+//			Log.d("#RoomCheckin#", "Room_Margin: " + Double.toString(room_margin));
+//			Log.d("#RoomCheckin#", "Rooms left: " + Integer.toString(RoomEntries.size()));
 
 		} while (RoomEntries.size() > 1);
 

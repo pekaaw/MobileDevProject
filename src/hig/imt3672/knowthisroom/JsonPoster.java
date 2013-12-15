@@ -1,18 +1,22 @@
 package hig.imt3672.knowthisroom;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,61 +45,108 @@ public class JsonPoster {
 		this.jsonPage = jsonPage;
 	}
 
-	public void postToPage(PlusClient client, String room, List<String> BSSID) {
-		jsonPage = prefs.getString("text_weblink", "");
-		// If there is no webpage set, we return
-		if (jsonPage.isEmpty() || BSSID.isEmpty()) {
-			Log.d("PostToPage", "Jsonpage or BSSID is empty");
-			return;
-		}
-		try {
-			// URI for page
-			URI page = new URI(jsonPage);
-			// Default HTTPClient
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			// Url with the POST data
-			HttpPost httpPostRequest = new HttpPost(page);
-			// The Json object that we are posting
-			JSONObject jayson = new JSONObject();
-			// Time to get the current time
-			Calendar time = Calendar.getInstance();
-			// StringEntity to hold all the json data as a string
-			StringEntity se;
+	public void postToPage(final PlusClient client, final String room, final List<String> BSSID) {
+		
+		Thread workload = new Thread() {
+			public void run() {
+				
+				/*
+				 * Thanks a lot to the programmer that shared this code:
+				 * http://www.androidsnippets.com/executing-a-http-post-request-with-httpclient
+				 */
+		
+				// Get the link we will post data to
+				jsonPage = prefs.getString("text_weblink", "");
 
-			// Fill the Json with data
-			jayson.put("user", client.getAccountName());
-			jayson.put("room", room);
-			jayson.put("time", time.get(Calendar.SECOND));
-			for (int i = 0; i < BSSID.size() && i < 5; i++) {
-				jayson.put("BSSID", BSSID.get(i));
-			}
-			// Put the Json as a string
-			se = new StringEntity(jayson.toString());
-			// Put it into the request
-			httpPostRequest.setEntity(se);
-			httpPostRequest.setHeader("Accept", "application/json");
-			httpPostRequest.setHeader("Content-Type", "application/json");
-			// Execute the post and get a response
-			HttpResponse response = httpClient.execute(httpPostRequest);
-			HttpEntity httpEntity = response.getEntity();
+//				// Do some logging for testing purposes
+//				Log.d("#JsonPoster#room", room );
+//				Log.d("#JsonPoster#jsonPage", jsonPage );
+//				for( String id : BSSID ) {
+//					Log.d("#JsonPoster#bssid", id);
+//				}
+				
+				// If there is no webpage set, we return
+				if ( jsonPage.isEmpty() ) {
+					Log.d("PostToPage", "Jsonpage not set");
+					return;
+				}
+				
+				try {
 
-			Log.i("Jayson is:", httpEntity.toString());
-
-		} catch (JSONException e) {
-			Log.e("Json", "Error in creating Json object");
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			Log.e("URI", "Error in creating URI");
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			Log.e("ClientProtocol", "Someplace network");
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		}
-	}
+					// The Json object that we are posting
+					JSONObject jayson = new JSONObject();
+					
+					// Get the current time
+					Calendar time = Calendar.getInstance();
+					//SimpleDateFormat dateFormat = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss a");
+					DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance();
+					String date = dateFormat.format( time.getTime() );
+					
+					// Fill the Json with data
+					jayson.put("room", room);
+					jayson.put("time", date);
+					
+					// Add e-mail-address to the json-object
+					if( client.isConnected() ) {
+						jayson.put("user", client.getAccountName());
+					}
+					
+					// Add the bssid's to the jsonobject
+					JSONArray bssids = new JSONArray();
+					for (int i = 0; i < BSSID.size() && i < 5; i++) {
+						bssids.put( BSSID.get(i) );
+					}
+					jayson.put("BSSID", bssids);
+					
+					// The data to post
+					String jsonString = jayson.toString(4);
+				
+					try {
+						// Instantiate a new client
+						HttpClient webClient = new DefaultHttpClient();
+						
+						// Url to post to
+						String postURL = jsonPage;
+						
+						// Create a post-instance pointing to the url
+						HttpPost post = new HttpPost(postURL);
+						
+						// Create a list of encoded data
+						List<NameValuePair> params = new ArrayList<NameValuePair>();
+						params.add(new BasicNameValuePair("data", jsonString));
+						UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params,HTTP.UTF_8);
+						
+						// Attach the data to the HttpPost-instance
+						post.setEntity(ent);
+						
+						// Execute the call
+						HttpResponse responsePOST = webClient.execute(post);
+						
+						// Get the respons
+						HttpEntity resEntity = responsePOST.getEntity();
+						
+						// If we got a response, log this
+						if (resEntity != null) {    
+						    Log.i("RESPONSE",EntityUtils.toString(resEntity));
+						}
+					
+					// catch exceptions
+				    } catch (Exception e) {
+				        e.printStackTrace();
+				    }
+					
+				// catch more exceptions
+				} catch (JSONException e1) {
+					e1.printStackTrace();
+				} finally {
+					
+				}
+				
+			} // end of run()
+			
+		}; // end of thread definition
+		
+		workload.start();
+		
+	} // end of postToPage()
 }
