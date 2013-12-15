@@ -80,15 +80,20 @@ public class RoomCheckin {
 
 		find_room_locked = true;
 
+		List<DBRoomEntry> Rooms = Db.getAllDBRoomEntries();
+
 		Tower = ServiceHandler.getInstance().m_CellTowerHander.mCellTowerData;
+		// Check for nullptr. If so, return all rooms to wifiscan.
+		if( Tower == null ) {
+			return Rooms;
+		}
+		
 		Bundle Towerinfo = Tower.getCellTowerBundle();
 		Integer towerId = Towerinfo.getInt("CellID");
 		Integer towerStrength = Towerinfo.getInt("Strength");
 
 		Log.d("Checkin", "Tower is " + Integer.toString(towerId)
 				+ " with strength " + Integer.toString(towerStrength) + ".");
-
-		List<DBRoomEntry> Rooms = Db.getAllDBRoomEntries();
 
 		int i = 0;
 
