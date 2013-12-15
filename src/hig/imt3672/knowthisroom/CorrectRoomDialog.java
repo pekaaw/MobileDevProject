@@ -39,7 +39,7 @@ public class CorrectRoomDialog extends DialogFragment implements
 		getDialog().getWindow().requestFeature(Window.FEATURE_LEFT_ICON);
 		getDialog().setTitle(R.string.update_room_headline);
 		
-		m_view = inflater.inflate(R.layout.correct_room, null);
+		m_view = inflater.inflate(R.layout.correct_room_dialog, null);
 		m_view.findViewById(R.id.add_room).setOnClickListener(this);
 		
 		return m_view;

@@ -3,6 +3,7 @@
     android:id="@+id/detailed_room_view"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+	android:layout_margin="@dimen/activity_horizontal_margin"
     android:orientation="vertical" >
 
     <Button
@@ -10,7 +11,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:text="@string/add_room" />
     
     <TextView
@@ -18,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/add_room"
+		android:layout_margin="@dimen/activity_horizontal_margin"
         android:text="@string/update_room"
         android:textSize="@dimen/font_size" />
 
@@ -25,6 +28,7 @@
         android:id="@+id/current_rooms"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/or_choose_old_room" />
+        android:layout_below="@id/or_choose_old_room"
+        android:layout_margin="@dimen/activity_horizontal_margin" />
   
 </RelativeLayout>
