@@ -71,8 +71,8 @@ public class GplusHandler {
 
 		// Builds a moment
 		Moment moment = new Moment.Builder()
-				//.setType("http://schemas.google.com/CheckInActivity")
-				.setType("http://schemas.google.com/AddActivity")
+				.setType("http://schemas.google.com/CheckInActivity")
+				//.setType("http://schemas.google.com/AddActivity")
 				.setTarget(itemScope)
 				.build();
 		Log.d("#GplusHandler#", moment.toString());

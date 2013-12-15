@@ -55,6 +55,7 @@ public class DBOperator { // Handles normal usage of the database
 
 	private boolean insertWifi(String wifiBSID, long roomId, long strengthMin,
 			long strengthMax) {
+		open();
 		ContentValues wifiValues = new ContentValues();
 		wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID, roomId);
 		// <-is as it should be
@@ -71,6 +72,7 @@ public class DBOperator { // Handles normal usage of the database
 
 		/* long wifiInsertId = */
 		database.insert(ExtendedSQLLiteHelper.WIFI_ROOM_TABLE, null, wifiValues);
+		close();
 		return true;
 	}
 
@@ -90,11 +92,16 @@ public class DBOperator { // Handles normal usage of the database
 		// <-set a default value?
 
 		/* long cellInsertId = */
+		open();
 		database.insert(ExtendedSQLLiteHelper.CELLTOWER_TABLE, null, cellValues);
+		close();
 		return true;
 	}
 
 	public DBRoomEntry createRoom(String room, Bundle cellTowerBundle) {
+		// open db
+		open();
+		
 		ContentValues roomValues = new ContentValues();
 		roomValues.put(ExtendedSQLLiteHelper.ROOM_COLUMN_NAME, room);
 		long insertId = database.insert(ExtendedSQLLiteHelper.ROOM_TABLE, null,
@@ -107,12 +114,17 @@ public class DBOperator { // Handles normal usage of the database
 		DBRoomEntry newRoom = cursorToDBRoomEntry(cursor);
 		cursor.close();
 		updateRoom(newRoom, cellTowerBundle);
+		
+		// close db
+		close();
+		
 		return newRoom;
 	}
 
 	public void deleteRoom(DBRoomEntry room) {
 		long id = room.getId();
 		System.out.println("Room deleted with id: " + id);
+		open();
 		database.delete(ExtendedSQLLiteHelper.ROOM_TABLE,
 				ExtendedSQLLiteHelper.ROOM_COLUMN_ID + " = " + id, null);
 
@@ -123,6 +135,7 @@ public class DBOperator { // Handles normal usage of the database
 		database.delete(ExtendedSQLLiteHelper.WIFI_ROOM_TABLE,
 				ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID + " = " + id,
 				null);
+		close();
 	}
 
 	public void updateRoom(DBRoomEntry room, Bundle cellTowerBundle) {
@@ -138,6 +151,7 @@ public class DBOperator { // Handles normal usage of the database
 			networkList.add(new DBWifiInRoomEntry(item.BSSID, room.getId(),
 					item.level));
 		}
+		open();
 		DBnetworkList = this.getWifi(room.getId());
 
 		// prepare list of new networks
@@ -163,13 +177,14 @@ public class DBOperator { // Handles normal usage of the database
 			updateCell(room, cellTowerId, towerStrength);
 		}
 
-		// }
+		close();
 
 	}
 
 	public boolean updateWifi(String BSID, long roomId, int signalStrenght) {
 		// TODO updatewifi
 		// CHECK IF THE WIFI EXISTS BEFORE YOU RUN THIS FUNCTION
+		open();
 
 		ContentValues wifiValues = new ContentValues();
 		// Database sql get-statements
@@ -207,17 +222,19 @@ public class DBOperator { // Handles normal usage of the database
 			wifiValues.put(ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN,
 					signalStrenght);
 		} else {
+			close();
 			return false;
 		}
 		database.update(ExtendedSQLLiteHelper.WIFI_ROOM_TABLE, wifiValues,
 				WHERE_STATEMENT, null);
+		close();
 		return true;
 	}
 
 	public boolean updateCell(DBRoomEntry room, long cellId, long signalStrenght) {
 
 		// CHECK IF THE CELLTOWER EXISTS BEFORE YOU RUN THIS FUNCTION
-
+		open();
 		ContentValues cellValues = new ContentValues();
 		long roomId = room.getId();
 		// Database sql get-statements
@@ -251,10 +268,12 @@ public class DBOperator { // Handles normal usage of the database
 			cellValues.put(ExtendedSQLLiteHelper.CELLTOWER_COLUMN_MIN,
 					signalStrenght);
 		} else {
+			close();
 			return false;
 		}
 		database.update(ExtendedSQLLiteHelper.CELLTOWER_TABLE, cellValues,
 				GET_CELLTOWER, null);
+		close();
 		return true;
 	}
 
@@ -264,6 +283,7 @@ public class DBOperator { // Handles normal usage of the database
 
 	public List<DBRoomEntry> getAllDBRoomEntries() {
 		List<DBRoomEntry> rooms = new ArrayList<DBRoomEntry>();
+		open();
 
 		Cursor cursor = database.query(ExtendedSQLLiteHelper.ROOM_TABLE,
 				allRooms, null, null, null, null,
@@ -278,6 +298,7 @@ public class DBOperator { // Handles normal usage of the database
 		}
 		// Make sure to close the cursor
 		cursor.close();
+		close();
 		return rooms;
 	}
 
@@ -295,6 +316,7 @@ public class DBOperator { // Handles normal usage of the database
 
 	// ::::::::cursor for towers:::::::::::
 	public boolean cellExists(long roomId, long ID) {
+		open();
 		List<DBCelltowerEntry> list = new ArrayList<DBCelltowerEntry>();
 
 		String whereStatement = (ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
@@ -312,6 +334,8 @@ public class DBOperator { // Handles normal usage of the database
 		}
 		// Make sure to close the cursor
 		cursor.close();
+		// Close the db
+		close();
 
 		if (list.size() > 1)
 			return true; // error more than one hit
@@ -322,6 +346,7 @@ public class DBOperator { // Handles normal usage of the database
 	}
 
 	public List<DBCelltowerEntry> getCellTowers(long roomId) {
+		open();
 		List<DBCelltowerEntry> returnList = new ArrayList<DBCelltowerEntry>();
 
 		String whereStatement = ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
@@ -338,7 +363,7 @@ public class DBOperator { // Handles normal usage of the database
 		}
 		// Make sure to close the cursor
 		cursor.close();
-
+		close();
 		return returnList;
 
 	}
@@ -364,6 +389,7 @@ public class DBOperator { // Handles normal usage of the database
 		String whereStatement = (ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_ROOM_ID
 				+ "=" + roomId);
 
+		open();
 		Cursor cursor = database.query(ExtendedSQLLiteHelper.WIFI_ROOM_TABLE,
 				null, whereStatement, null, null, null,
 				ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN + " DESC");
@@ -376,7 +402,8 @@ public class DBOperator { // Handles normal usage of the database
 		}
 		// Make sure to close the cursor
 		cursor.close();
-
+		// close db
+		close();
 		return returnList;
 
 	}
@@ -394,6 +421,9 @@ public class DBOperator { // Handles normal usage of the database
 	 */
 	public List<String> getWifiBsIDs(long roomId, int numbersOfRooms) {
 
+		// open db
+		open();
+
 		// List to return - with name of BSID's
 		List<String> wifiNameList = new ArrayList<String>();
 
@@ -405,7 +435,8 @@ public class DBOperator { // Handles normal usage of the database
 				ExtendedSQLLiteHelper.WIFI_ROOM_COLUMN_MIN + " DESC");
 
 		// if we got nothing from the db, return the empty list.
-		if (cursor.getCount() == 0) {
+		if( cursor.getCount() == 0 ) {
+
 			return wifiNameList;
 		}
 
@@ -427,6 +458,9 @@ public class DBOperator { // Handles normal usage of the database
 
 		// close cursor
 		cursor.close();
+		
+		// close db
+		close();
 
 		// wifiNameList should now be #numberOfRooms long
 		return wifiNameList;
@@ -436,6 +470,7 @@ public class DBOperator { // Handles normal usage of the database
 		// i was hoping to do this on the server but i can't find a way to do
 		// that
 		List<DBWifiInRoomEntry> list = new ArrayList<DBWifiInRoomEntry>();
+		open();
 
 		String whereStatement = (ExtendedSQLLiteHelper.CELLTOWER_COLUMN_ROOM_ID
 				+ "=" + String(roomId) + "AND"
@@ -452,6 +487,9 @@ public class DBOperator { // Handles normal usage of the database
 		}
 		// Make sure to close the cursor
 		cursor.close();
+		
+		// Close db
+		close();
 
 		if (list.size() > 1)
 			return true; // error more than one hit

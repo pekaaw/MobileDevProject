@@ -58,12 +58,12 @@ public class JsonPoster {
 				// Get the link we will post data to
 				jsonPage = prefs.getString("text_weblink", "");
 
-				// Do some logging for testing purposes
-				Log.d("#JsonPoster#room", room );
-				Log.d("#JsonPoster#jsonPage", jsonPage );
-				for( String id : BSSID ) {
-					Log.d("#JsonPoster#bssid", id);
-				}
+//				// Do some logging for testing purposes
+//				Log.d("#JsonPoster#room", room );
+//				Log.d("#JsonPoster#jsonPage", jsonPage );
+//				for( String id : BSSID ) {
+//					Log.d("#JsonPoster#bssid", id);
+//				}
 				
 				// If there is no webpage set, we return
 				if ( jsonPage.isEmpty() ) {
@@ -83,9 +83,13 @@ public class JsonPoster {
 					String date = dateFormat.format( time.getTime() );
 					
 					// Fill the Json with data
-					jayson.put("user", client.getAccountName());
 					jayson.put("room", room);
 					jayson.put("time", date);
+					
+					// Add e-mail-address to the json-object
+					if( client.isConnected() ) {
+						jayson.put("user", client.getAccountName());
+					}
 					
 					// Add the bssid's to the jsonobject
 					JSONArray bssids = new JSONArray();

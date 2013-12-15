@@ -66,7 +66,6 @@ public class MainActivity extends FragmentActivity implements
 		i.putExtra("receiver", resultReceiver);
 		startService(i);
 
-		
 		WifiSensor.createInstance(this);
 	}
 
