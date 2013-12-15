@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Gjennkjenn dette rommet</string>
+    <string name="gplus_connect">Koble til G+</string>
+    <string name="gplus_disconnect">Koble fra G+</string>
+    <string name="add_room">Legg til rom</string>
+    <string name="delete_room">Slett rom</string>
+    <string name="update_room">Oppdater rom:</string>
+    <string name="update_room_not_found">"Jeg vet ikke&#8230;"</string>
+    <string name="update_room_wrong_btn">Feil rom?</string>
+    <string name="add_room_instruction">Rom navn:</string>
+    <string name="delete_room_headline">Virkelig slette rom?</string>
+    <string name="update_room_headline">Oppdatere rom med det mobilen ser nå?</string>
+    <string name="detailed_room_headline">"Detlajer om, "</string>
+    <string name="detailed_tower_header">GSM tårn info:</string>
+    <string name="detailed_wifi_header">WiFi info:</string>
+    
+    <string name="details_room_visible_networks">Synlige nettverk</string>
+    <string name="details_room_bsid">BSID</string>
+    <string name="details_room_strength">Styrke</string>
+    
+    <string name="dummytext">Tulletekst!</string>
+    
+    <!-- Settings -->
+    <string name="action_settings">Innstillinger</string>
+    <string name="settings_category_posting">Sender til nett</string>
+    <string name="settings_post_to_weblink">Egenvalgt web-server</string>
+    <string name="settings_server_weblink">Spessifiser egen web-server</string>
+    <string name="settings_post_to_gplus_moments">Google+ moments</string>
+    <string name="settings_post_to_gplus_stream">Google+ stream</string>
+     
+</resources>
