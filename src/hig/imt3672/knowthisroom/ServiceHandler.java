@@ -10,6 +10,7 @@ import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -296,8 +297,15 @@ public class ServiceHandler extends Service implements ConnectionCallbacks,
 		// Send the message to a handler in the activity
 		MainActivity.getInstance().setRoomHandler.sendMessage(msg);
 		// Sends the thing stuff to the json poster dude
-		m_jsonPoster.postToPage(m_PlusClient, room.getName(),
-				m_Database.getWifiBsIDs(room.getId(), 4));
+		
+		Boolean webpostIsChecked = PreferenceManager
+					.getDefaultSharedPreferences(this)
+					.getBoolean("checkbox_weblink", false);
+		
+		if( webpostIsChecked ) {
+			m_jsonPoster.postToPage( m_PlusClient, room.getName(),
+					m_Database.getWifiBsIDs(room.getId(), 4) );
+		}
 	}
 
 }
